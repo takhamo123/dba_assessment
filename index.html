@@ -726,7 +726,7 @@ function hudHome() {
 }
 function hudQuiz() {
   return `<div class="in">
-    <b class="lg"><span class="mk">DBA</span>P9: OPTIMASI PERFORMA SISTEM</b>
+    <b class="lg"><span class="mk">DBA</span>OPTIMASI PERFORMA SISTEM</b>
     <span class="pl">
       <span id="tmr"></span>
       <span>Pelanggaran: ${S.v}/${CFG.MAKS_PELANGGARAN}</span>
@@ -742,7 +742,6 @@ function home() {
   const galat = !BANK_OK ? 'Bank soal tidak valid. Hubungi dosen.' : (!STORAGE_OK ? 'Penyimpanan browser diblokir (mode privat?). Nonaktifkan lalu muat ulang halaman.' : '');
   return `<div class="login">
     <section class="card">
-      <h1><span class="hl">ASESMEN</span> DBA</h1>
       <p class="sub" style="margin-bottom:2px;">OPTIMASI PERFORMA SISTEM</p>
       <div class="pesan info" style="font-size:.92rem">
         <b>Aturan Asesmen</b><br>
@@ -1119,7 +1118,6 @@ function dosen() {
   return `<div class="login" style="max-width:900px;">
     <section class="card">
       <h2>Portal Administrasi Dosen</h2>
-      <p style="color:var(--slate-600); margin-bottom:12px;">Data tersimpan di browser/perangkat ini saja.</p>
       <div class="stat-grid">
         <div class="stat-box"><div class="val">${rs.length}</div><div class="lbl">Selesai</div></div>
         <div class="stat-box"><div class="val">${aktif.length}</div><div class="lbl">Belum Selesai</div></div>
