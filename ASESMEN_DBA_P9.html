@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>ASESMEN DATABASE ADMINISTRATION — Pertemuan 9</title>
+<style>
+:root {
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  
+  --brand: #2563eb;
+  --brand-hover: #1d4ed8;
+  --brand-light: #eff6ff;
+  --brand-border: #bfdbfe;
+  
+  --g: #10b981; --g-bg: #d1fae5; --g-txt: #065f46; --g-border: #a7f3d0;
+  --r: #e11d48; --r-bg: #ffe4e6; --r-txt: #9f1239; --r-border: #fecdd3;
+  --y: #f59e0b; --y-bg: #fef3c7; --y-txt: #92400e; --y-border: #fde68a;
+  
+  --radius: 16px;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 30px -5px rgba(15, 23, 42, 0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--slate-800);
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
+  background-attachment: fixed;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header HUD */
+.hud {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #fff;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.hud .in {
+  max-width: 960px;
+  margin: auto;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lg {
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.mk {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand), #1d4ed8);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.pl {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1.5px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Container & Cards */
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: clamp(22px, 4vw, 34px);
+  margin: 20px 0 24px;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  margin: 0 0 0.3em;
+  font-weight: 800;
+  color: var(--slate-900);
+}
+
+h1 .hl {
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 12px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+h2, h3 {
+  margin: 0.3em 0 0.5em;
+  color: var(--slate-900);
+  font-weight: 800;
+}
+
+.sub {
+  font-weight: 700;
+  color: var(--brand);
+  margin: 0 0 1em;
+  font-size: 1.05rem;
+}
+
+.login {
+  max-width: 650px;
+  margin: 24px auto;
+}
+
+/* Forms & Inputs */
+label {
+  font-weight: 700;
+  display: block;
+  font-size: 0.9rem;
+  color: var(--slate-700);
+  margin-bottom: 6px;
+}
+
+input, select {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: 4px 0 18px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--slate-200);
+  border-radius: 12px;
+  font: inherit;
+  background: #fff;
+  color: var(--slate-900);
+  transition: border-color 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.input-error {
+  border-color: var(--r) !important;
+  background-color: #fff1f2 !important;
+}
+
+/* Buttons System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 24px;
+  margin: 8px 10px 6px 0;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: var(--brand-hover);
+  transform: translateY(-2px);
+}
+
+.btn.alt {
+  background: #fff;
+  color: var(--slate-700);
+  border: 1.5px solid var(--slate-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn.alt:hover {
+  background: var(--slate-50);
+  color: var(--slate-900);
+}
+
+.btn.danger {
+  background: var(--r-bg);
+  color: var(--r-txt);
+  border: 1.5px solid var(--r-border);
+}
+
+.btn.danger:hover {
+  background: #ffe4e6;
+}
+
+.opt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  min-height: 54px;
+  padding: 14px 18px;
+  margin: 10px 0;
+  background: #fff;
+  color: var(--slate-800);
+  border: 1.5px solid var(--slate-200);
+  border-radius: 14px;
+  font: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.opt:hover {
+  border-color: var(--brand);
+  background: var(--brand-light);
+}
+
+.opt.selected {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  font-weight: 700;
+}
+
+.opt i {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--slate-100);
+  color: var(--slate-700);
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.opt.selected i {
+  background: var(--brand);
+  color: #fff;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border-radius: 99px;
+}
+.chip.ok { background: var(--g-bg); color: var(--g-txt); border: 1px solid var(--g-border); }
+.chip.bad { background: var(--r-bg); color: var(--r-txt); border: 1px solid var(--r-border); }
+
+/* Anti-cheat overlay warning */
+.anti-cheat-alert {
+  background: var(--r-bg);
+  border: 1.5px solid var(--r-border);
+  color: var(--r-txt);
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Stepper UI */
+.stp { display: flex; gap: 6px; margin: 10px 0 20px; overflow-x: auto; padding-bottom: 4px; }
+.stp span {
+  flex: 1; min-width: 36px; height: 36px; border-radius: 10px; background: var(--slate-100);
+  color: var(--slate-600); display: grid; place-items: center; font-weight: 700; font-size: 0.88rem;
+  border: 1px solid var(--slate-200); cursor: pointer;
+}
+.stp .on { background: var(--brand); color: #fff; border-color: var(--brand); }
+.stp .dn { background: var(--g-bg); color: var(--g-txt); border-color: var(--g-border); }
+
+.summary-hero {
+  text-align: center;
+  padding: 28px 20px;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.06) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.stat-box {
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.stat-box .val { font-size: 1.8rem; font-weight: 800; line-height: 1.2; }
+.stat-box .lbl { font-size: 0.78rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase; margin-top: 4px; }
+
+#toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: var(--slate-900); color: #fff; padding: 12px 26px; border-radius: 99px;
+  display: none; z-index: 100; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); font-weight: 600;
+}
+
+.dlg { position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.6); display: grid; place-items: center; padding: 16px; }
+.dlg[hidden] { display: none; }
+.dlg-box { background: #fff; border-radius: var(--radius); padding: 24px; max-width: 420px; width: 100%; box-shadow: var(--shadow-lg); }
+.dlg-err { color: var(--r-txt); min-height: 1.3em; font-weight: 600; margin: 4px 0 8px; }
+.review-item { border: 1px solid var(--slate-200); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: #fff; }
+
+.noselect{-webkit-user-select:none;user-select:none}
+.dlg-box p{white-space:pre-line}
+.dlg-box.warn{border-top:6px solid var(--r)}
+.dlg-box.warn h3{color:var(--r-txt)}
+.pesan{border-radius:14px;padding:16px 20px;margin:16px 0;border:1.5px solid var(--slate-200)}
+.pesan h3{color:inherit;margin:0 0 6px}
+.pesan.ok{background:var(--g-bg);border-color:var(--g-border);color:var(--g-txt)}
+.pesan.semangat{background:var(--y-bg);border-color:var(--y-border);color:var(--y-txt)}
+.pesan.info{background:var(--r-bg);border-color:var(--r-border);color:var(--r-txt)}
+.hud .pl{flex-wrap:wrap;justify-content:flex-end}
+body.terkunci #app{filter:blur(14px);pointer-events:none;-webkit-user-select:none;user-select:none}
+.dlg-box.warn{box-shadow:0 0 0 9999px rgba(15,23,42,.35),var(--shadow-lg)}
+@media print{body{display:none!important}}
+</style>
+</head>
+<body>
+
+<header id="hd" class="hud"></header>
+<main id="app" class="wrap"></main>
+<div id="toast" role="status"></div>
+<div id="dlg" class="dlg" hidden></div>
+
+<script>
+/* ===== BANK 20 SOAL ASESMEN PERTEMUAN 9: OPTIMASI PERFORMA SISTEM ===== */
+const BANK_SOAL = [
+  {
+    "t": 1,
+    "q": "Mengapa pengurangan operasi baca dan tulis ke subsistem penyimpanan disk (Disk I/O) menjadi fokus utama dalam optimasi performa basis data relasional?",
+    "o": [
+      "Karena kapasitas penyimpanan sekunder jauh lebih terbatas dibandingkan ruang memori utama sehingga baris data sering terhapus otomatis",
+      "Karena waktu akses media penyimpanan sekunder ribuan hingga jutaan kali lebih lambat dibandingkan pemrosesan di memori utama (RAM)",
+      "Karena seluruh proses pengurutan kueri dan penggabungan tabel hanya dapat dieksekusi langsung di atas sektor cakram penyimpanan",
+      "Karena setiap permintaan pembacaan data dari RAM wajib disinkronkan terlebih dahulu ke berkas log transaksi sebelum dikirim ke klien"
+    ],
+    "a": 1,
+    "e": "Akses baca/tulis pada subsistem Disk I/O membutuhkan waktu ribuan hingga jutaan kali lebih lambat dibandingkan operasi di dalam RAM dan register CPU, sehingga menekan Disk I/O fisik menjadi kunci utama optimasi performa."
+  },
+  {
+    "t": 1,
+    "q": "Bagaimana pendekatan manajemen performa proaktif yang harus dijalankan oleh seorang Database Administrator (DBA) untuk mencegah kemacetan (bottleneck) Disk I/O?",
+    "o": [
+      "Menunggu laporan kelumpuhan aplikasi dari pengguna terlebih dahulu sebelum menambah kapasitas prosesor dan mengganti skema tabel",
+      "Menonaktifkan pencatatan transaksi secara berkala agar seluruh beban penulisan dialihkan sementara ke berkas cadangan eksternal",
+      "Menjalankan pemantauan berkelanjutan (ongoing monitoring) serta memadukan rancangan indeks presisi dengan retensi halaman aktif di RAM",
+      "Memindahkan seluruh tabel transaksional ke mesin penyimpanan sementara agar tidak pernah menyentuh media penyimpanan permanen"
+    ],
+    "a": 2,
+    "e": "Manajemen performa wajib dijalankan secara proaktif melalui pemantauan berkelanjutan (ongoing monitoring) dengan mengombinasikan strategi pengurangan pembacaan blok (indeks presisi) dan retensi halaman aktif di InnoDB Buffer Pool."
+  },
+  {
+    "t": 2,
+    "q": "Bagaimana konsekuensi arsitektural (trade-off) dari penambahan struktur indeks sekunder terhadap kinerja operasi basis data?",
+    "o": [
+      "Mempercepat penelusuran baris pada operasi pembacaan (SELECT), tetapi menambah konsumsi ruang penyimpanan serta beban penulisan (write overhead)",
+      "Mempercepat seluruh operasi penyisipan baris baru (INSERT), tetapi memperlambat pemindaian rentang nilai pada kueri pembacaan terurut",
+      "Menghilangkan kebutuhan alokasi memori pada InnoDB Buffer Pool, tetapi memaksa setiap kueri melakukan pemindaian penuh seluruh tabel",
+      "Mengurangi ukuran berkas tablespace di media penyimpanan, tetapi menonaktifkan konsistensi kunci primer saat terjadi pembaruan data"
+    ],
+    "a": 0,
+    "e": "Setiap indeks mempercepat pencarian data saat pembacaan, namun menimbulkan biaya pemeliharaan berupa tambahan ruang penyimpanan serta beban penulisan (write overhead) karena setiap INSERT, UPDATE, dan DELETE wajib memperbarui struktur indeks terkait."
+  },
+  {
+    "t": 2,
+    "q": "Pada indeks komposit B+Tree dengan urutan kolom (kode_fakultas, tahun_terbit), mengapa kueri dengan klausa WHERE tahun_terbit = 2025 tidak dapat menelusuri pohon indeks secara optimal?",
+    "o": [
+      "Karena kolom bertipe bilangan bulat tidak pernah disimpan di dalam simpul daun struktur B+Tree pada mesin penyimpanan InnoDB",
+      "Karena mesin InnoDB hanya mengizinkan satu kolom kunci digunakan sebagai kondisi penyaringan pada setiap eksekusi kueri tunggal",
+      "Karena nilai tahun terbit selalu dipetakan menggunakan fungsi hash acak sehingga urutan kronologisnya hilang di dalam pohon indeks",
+      "Karena entri indeks komposit diurutkan mulai dari kolom awalan paling kiri (leftmost prefix), sehingga pencarian tanpa kolom pertama tidak terarah"
+    ],
+    "a": 3,
+    "e": "Indeks komposit B+Tree menyusun kunci secara hierarkis berdasarkan prinsip leftmost prefix (dimulai dari kolom pertama kode_fakultas), sehingga pencarian yang langsung menyaring kolom kedua tanpa kolom pertama tidak dapat memanfaatkan urutan pohon secara optimal."
+  },
+  {
+    "t": 3,
+    "q": "Karakteristik arsitektural manakah pada struktur B+Tree InnoDB yang menjelaskan kemampuannya memproses kueri rentang (seperti BETWEEN atau >=) secara efisien?",
+    "o": [
+      "Simpul akar (root node) menyimpan seluruh salinan kolom baris tabel sehingga kueri rentang selesai dalam satu kali pembacaan blok",
+      "Simpul daun (leaf nodes) menyimpan nilai kunci secara terurut dan saling terhubung secara berantai dua arah (doubly linked list)",
+      "Setiap simpul cabang memetakan nilai kunci melalui fungsi hash deterministik agar lompatan antarbatas rentang berjalan konstan",
+      "Struktur pohon meniadakan penyeimbangan tinggi cabang sehingga data terbaru selalu ditempatkan pada simpul paling atas"
+    ],
+    "a": 1,
+    "e": "Pada struktur B+Tree InnoDB, seluruh nilai kunci tersimpan secara terurut pada simpul daun (leaf nodes) yang saling terhubung melalui doubly linked list, memungkinkan pemindaian rentang (range scan) berjalan berurutan secara efisien."
+  },
+  {
+    "t": 4,
+    "q": "Apa karakteristik mendasar yang membedakan organisasi penyimpanan Clustered Index pada mesin InnoDB dibandingkan indeks non-clustered?",
+    "o": [
+      "Clustered Index menyusun fisik baris tabel mengikuti urutan kunci primer dan menyimpan seluruh kolom baris langsung di dalam simpul daunnya",
+      "Clustered Index memisahkan berkas fisik baris tabel dari pohon indeks dengan menyimpan penunjuk alamat sektor cakram pada setiap simpul",
+      "Clustered Index dapat dibuat lebih dari satu pada tabel yang sama untuk mengurutkan baris data berdasarkan beberapa kolom berbeda sekaligus",
+      "Clustered Index hanya menyimpan nilai kunci primer dan nilai ringkasan hash tanpa menyertakan kolom atribut lain di dalam simpul daun"
+    ],
+    "a": 0,
+    "e": "Setiap tabel InnoDB memiliki tepat satu Clustered Index (otomatis berasal dari PRIMARY KEY) yang menyatukan struktur indeks dengan penyimpanan fisik seluruh kolom baris data di dalam simpul daun (leaf node)."
+  },
+  {
+    "t": 5,
+    "q": "Mengapa kueri yang menyaring data melalui Secondary Index pada mesin InnoDB sering kali memicu mekanisme pencarian dua tahap (double lookup atau bookmark lookup)?",
+    "o": [
+      "Karena simpul daun Secondary Index hanya menyimpan nomor blok halaman disk yang harus diverifikasi ulang melalui kamus data sistem",
+      "Karena mesin InnoDB wajib membandingkan hasil pencarian Secondary Index dengan isi Hash Index untuk memastikan keunikan setiap baris",
+      "Karena simpul daun Secondary Index hanya menyimpan nilai kolom terindeks beserta Primary Key, sehingga sisa kolom harus diambil dari Clustered Index",
+      "Karena setiap pembacaan melalui Secondary Index otomatis memicu penyusunan ulang seluruh halaman daun sebelum baris dikirim ke aplikasi"
+    ],
+    "a": 2,
+    "e": "Simpul daun Secondary Index menyimpan nilai kolom yang diindeks dan salinan Primary Key baris tersebut. Jika kueri membutuhkan kolom lain di luar indeks, InnoDB melakukan pencarian kedua (bookmark lookup) menuju Clustered Index."
+  },
+  {
+    "t": 5,
+    "q": "Dalam kondisi bagaimanakah sebuah Secondary Index berperan sebagai Covering Index sehingga meniadakan kebutuhan akses tambahan ke tabel utama?",
+    "o": [
+      "Apabila tabel utama berukuran lebih kecil daripada kapasitas alokasi memori sort_buffer_size dan join_buffer_size pada sesi klien",
+      "Apabila seluruh kolom yang diminta pada klausa penyaringan memiliki tingkat kardinalitas rendah dan tidak mengandung nilai kosong",
+      "Apabila kueri hanya dijalankan pada jam beban kerja rendah setelah proses reorganisasi halaman fisik melalui perintah OPTIMIZE TABLE",
+      "Apabila seluruh kolom yang diminta oleh kueri sudah tersedia lengkap di dalam simpul daun (leaf node) struktur indeks sekunder tersebut"
+    ],
+    "a": 3,
+    "e": "Ketika seluruh kolom yang dibutuhkan kueri sudah tercakup di dalam leaf node Secondary Index, kondisi optimal ini disebut Covering Index karena InnoDB tidak perlu melakukan bookmark lookup ke Clustered Index."
+  },
+  {
+    "t": 6,
+    "q": "Mengapa struktur Hash Index tidak dapat dimanfaatkan untuk mempercepat operasi pencarian rentang (<, >, BETWEEN) maupun pengurutan (ORDER BY)?",
+    "o": [
+      "Karena fungsi hash memetakan nilai kunci secara deterministik ke alamat pointer memori tanpa mempertahankan urutan logis antarnilai kunci",
+      "Karena tabel pemetaan hash hanya mampu menyimpan kolom bertipe teks panjang sehingga perbandingan aritmetika tidak dapat dieksekusi",
+      "Karena setiap entri di dalam bucket hash selalu diurutkan berdasarkan waktu penyisipan transaksi dan bukan berdasarkan nilai kolom kunci",
+      "Karena struktur indeks hash secara otomatis menghapus penunjuk antarhalaman setiap kali transaksi pembacaan selesai dijalankan"
+    ],
+    "a": 0,
+    "e": "Hash Index memetakan nilai kunci menggunakan fungsi hash ke lokasi pointer memori untuk pencocokan kesetaraan penuh (=, <=>, IN) saja, sehingga tidak mempertahankan urutan logis untuk operasi rentang (<, >) maupun ORDER BY."
+  },
+  {
+    "t": 6,
+    "q": "Apa perbedaan mendasar antara penggunaan indeks HASH eksplisit pada mesin MEMORY dengan fitur Adaptive Hash Index (AHI) pada mesin InnoDB?",
+    "o": [
+      "Indeks HASH eksplisit hanya mendukung pemindaian rentang berurutan, sedangkan Adaptive Hash Index khusus melayani pencarian teks semantik",
+      "Indeks HASH eksplisit didefinisikan pada skema tabel oleh pengguna, sedangkan Adaptive Hash Index dikelola otomatis secara internal oleh InnoDB",
+      "Indeks HASH eksplisit tersimpan permanen di dalam berkas tablespace disk, sedangkan Adaptive Hash Index ditulis ke berkas log transaksi",
+      "Indeks HASH eksplisit digunakan untuk menyusun fisik baris tabel utama, sedangkan Adaptive Hash Index menggantikan fungsi kunci primer"
+    ],
+    "a": 1,
+    "e": "Hash Index eksplisit dibuat secara manual pada definisi tabel (seperti pada MEMORY engine), sedangkan Adaptive Hash Index (AHI) merupakan optimasi internal yang dibangun dan dikelola otomatis oleh mesin InnoDB di memori."
+  },
+  {
+    "t": 6,
+    "q": "Bagaimana mekanisme kerja Fulltext Index dalam mempercepat pencarian kata pada kolom teks panjang dibandingkan klausa LIKE '%kata%'?",
+    "o": [
+      "Fulltext Index memadatkan seluruh isi kolom teks menjadi kunci bilangan bulat tunggal agar dapat dipindai berurutan dari awal tabel",
+      "Fulltext Index mengonversi setiap paragraf menjadi nilai hash berpanjang tetap sehingga pencarian substring berjalan tanpa membaca indeks",
+      "Fulltext Index membangun inverted index yang memetakan setiap token kata unik ke daftar baris beserta posisi kemunculannya",
+      "Fulltext Index menyalin seluruh kolom bertipe TEXT ke dalam segmen khusus sistem operasi agar terhindar dari proses tokenisasi kata"
+    ],
+    "a": 2,
+    "e": "Fulltext Index menyusun struktur Inverted Index yang memetakan setiap token kata unik ke daftar baris dan posisi kemunculannya (diakses via MATCH ... AGAINST), sehingga menggantikan pemindaian penuh LIKE '%kata%' yang memicu Disk I/O masif."
+  },
+  {
+    "t": 7,
+    "q": "Apa makna kondisi fragmentasi internal pada halaman B+Tree InnoDB berukuran 16 KB yang terpantau melalui nilai kolom DATA_FREE pada information_schema.TABLES?",
+    "o": [
+      "Kapasitas alokasi RAM pada InnoDB Buffer Pool telah penuh seluruhnya sehingga tidak ada lagi halaman bebas untuk menampung kueri baru",
+      "Seluruh entri indeks sekunder telah dipindahkan ke luar berkas tablespace utama akibat ukuran tabel melampaui batas standar sistem",
+      "Jumlah halaman kotor (dirty pages) di dalam memori telah melampaui ambang batas penulisan asinkron ke media penyimpanan NVMe SSD",
+      "Terdapat ruang kosong yang tertinggal di dalam halaman-halaman indeks maupun data akibat operasi DELETE dan UPDATE yang tersebar"
+    ],
+    "a": 3,
+    "e": "Operasi DELETE dan UPDATE pada tabel transaksional bervolume tinggi menyisakan ruang kosong sebagian di dalam halaman B+Tree 16 KB (internal fragmentation) yang tercermin melalui kolom DATA_FREE pada kamus data information_schema.TABLES."
+  },
+  {
+    "t": 7,
+    "q": "Mengapa perintah reorganisasi fisik seperti OPTIMIZE TABLE atau ALTER TABLE ... ENGINE=InnoDB perlu dijadwalkan pada periode beban rendah (maintenance window)?",
+    "o": [
+      "Karena proses pemadatan ulang halaman indeks dan data melakukan operasi penulisan ulang fisik yang intensif sehingga berpotensi membebani I/O",
+      "Karena perintah tersebut akan menghapus seluruh definisi Secondary Index dan Fulltext Index sehingga harus dibuat ulang secara manual",
+      "Karena eksekusi perintah tersebut otomatis menurunkan ukuran innodb_buffer_pool_size ke nilai bawaan instalasi selama proses berlangsung",
+      "Karena proses reorganisasi fisik hanya dapat berjalan apabila seluruh koneksi aplikasi diputus dan server dijalankan pada mode pemulihan"
+    ],
+    "a": 0,
+    "e": "Perintah OPTIMIZE TABLE atau ALTER TABLE ... ENGINE=InnoDB memadatkan kembali halaman yang terfragmentasi dan memulihkan efisiensi baca, namun melibatkan penulisan ulang fisik yang berat sehingga perlu dijadwalkan pada maintenance window."
+  },
+  {
+    "t": 8,
+    "q": "Mengapa penetapan kunci primer acak seperti UUIDv4 pada tabel InnoDB cenderung memicu pemecahan halaman berulang (page splits) dibandingkan kunci sekuensial AUTO_INCREMENT?",
+    "o": [
+      "Karena nilai UUIDv4 selalu disimpan di dalam berkas indeks terpisah sehingga mesin basis data harus menyinkronkan dua berkas setiap saat",
+      "Karena penyisipan kunci acak menempatkan baris baru ke tengah halaman Clustered Index yang sudah penuh sehingga halaman harus dipecah",
+      "Karena kunci bertipe string acak tidak didukung oleh algoritma penyeimbang pohon B+Tree sehingga cabang pohon terus bertambah ke satu sisi",
+      "Karena setiap nilai UUIDv4 memaksa mesin InnoDB menulis langsung ke media penyimpanan tanpa melewati mekanisme penyangga di Buffer Pool"
+    ],
+    "a": 1,
+    "e": "Karena Clustered Index menyusun baris fisik mengikuti urutan kunci primer, kunci sekuensial AUTO_INCREMENT menjaga penyisipan di ujung akhir halaman, sedangkan kunci acak UUIDv4 memicu random page insertion ke halaman penuh dan menyebabkan page splits."
+  },
+  {
+    "t": 9,
+    "q": "Apa peran utama InnoDB Buffer Pool di dalam arsitektur manajemen memori MySQL dalam menekan kemacetan Disk I/O?",
+    "o": [
+      "Menyimpan salinan permanen seluruh berkas redo log transaksi agar server tidak memerlukan media penyimpanan fisik saat terjadi pemulihan",
+      "Mengalokasikan memori khusus per koneksi sesi untuk menampung hasil pengurutan sementara pada parameter sort_buffer_size dan join_buffer_size",
+      "Menampung cache halaman data tabel dan halaman indeks aktif di dalam RAM sehingga permintaan akses berulang dilayani tanpa membaca disk",
+      "Mengompresi seluruh halaman tablespace berukuran 16 KB menjadi blok berukuran lebih kecil sebelum ditulis oleh sistem operasi ke cakram"
+    ],
+    "a": 2,
+    "e": "InnoDB Buffer Pool adalah area penyangga terpadu di dalam RAM yang menyimpan cache data pages, index pages, change buffer, dan adaptive hash index agar permintaan pembacaan berulang dilayani langsung dari memori berkecepatan tinggi."
+  },
+  {
+    "t": 9,
+    "q": "Bagaimana mekanisme Midpoint Insertion Strategy pada algoritma LRU InnoDB mencegah kueri pemindaian skala besar (seperti mysqldump) mencemari cache memori (cache pollution)?",
+    "o": [
+      "Dengan menolak seluruh permintaan pembacaan halaman dari kueri analitik apabila rasio pemakaian New Sublist telah mencapai batas 62,5 persen",
+      "Dengan langsung menempatkan setiap halaman yang baru dibaca dari disk ke puncak New Sublist dan menghapus halaman transaksi lama di bagian bawah",
+      "Dengan mengarahkan seluruh halaman hasil pemindaian tabel besar ke berkas sementara di disk agar tidak pernah memasuki area Buffer Pool",
+      "Dengan menyisipkan halaman baru ke kepala Old Sublist terlebih dahulu dan hanya mempromosikannya ke New Sublist jika diakses ulang setelah jeda waktu"
+    ],
+    "a": 3,
+    "e": "Algoritma Midpoint LRU membagi pool menjadi New Sublist (5/8) dan Old Sublist (3/8). Halaman baru disisipkan di batas kepala Old Sublist dan baru dipromosikan ke New Sublist jika diakses kembali setelah melewati jeda innodb_old_blocks_time (bawaan 1000 ms)."
+  },
+  {
+    "t": 9,
+    "q": "Bagaimana penafsiran yang tepat mengenai kondisi kesehatan memori apabila nilai Buffer Pool Hit-Ratio turun konsisten di bawah 95% disertai tingginya angka Innodb_buffer_pool_wait_free?",
+    "o": [
+      "Ukuran working set data aktif melampaui kapasitas innodb_buffer_pool_size sehingga terjadi pertukaran halaman RAM–Disk terus-menerus (memory thrashing)",
+      "Seluruh halaman data aktif telah berhasil dimuat seluruhnya ke dalam New Sublist sehingga permintaan pembacaan tidak lagi memerlukan ruang bebas",
+      "Kapasitas alokasi innodb_buffer_pool_size terlalu besar dibandingkan total RAM fisik sehingga sistem operasi menonaktifkan penulisan asinkron",
+      "Mekanisme penyapuan halaman kotor oleh thread Page Cleaner berjalan terlalu cepat sehingga memicu lonjakan pembacaan indeks dari memori utama"
+    ],
+    "a": 0,
+    "e": "Beban kerja OLTP yang sehat memiliki Buffer Pool Hit-Ratio >= 99% (minimal >= 95%). Jika rasio turun di bawah 95% disertai tingginya Innodb_buffer_pool_wait_free, kapasitas Buffer Pool tidak mencukupi working set aktif sehingga terjadi memory thrashing."
+  },
+  {
+    "t": 9,
+    "q": "Apa yang dimaksud dengan halaman kotor (dirty pages) di dalam InnoDB Buffer Pool, dan bagaimana mekanisme penyelarasan penulisan mencegah terjadinya checkpoint storm?",
+    "o": [
+      "Halaman indeks yang mengalami kerusakan struktur akibat kegagalan daya, yang diperbaiki secara otomatis saat server dijalankan kembali",
+      "Halaman di memori yang telah dimodifikasi transaksi tetapi belum ditulis ke disk, yang disapu secara teratur oleh thread Page Cleaner",
+      "Halaman hasil pemindaian penuh tabel pada Old Sublist yang tidak pernah diakses ulang sehingga segera ditimpa oleh halaman transaksi baru",
+      "Halaman duplikat yang tersimpan bersamaan di dalam Buffer Pool dan page cache sistem operasi akibat belum aktifnya mode akses langsung"
+    ],
+    "a": 1,
+    "e": "Dirty pages adalah halaman di dalam Buffer Pool yang sudah dimodifikasi oleh transaksi tetapi belum disinkronkan ke berkas tabel di disk. Thread latar belakang Page Cleaner menyapu dirty pages secara teratur sesuai innodb_io_capacity agar tidak terjadi lonjakan I/O mendadak (checkpoint storm)."
+  },
+  {
+    "t": 10,
+    "q": "Apa tujuan teknis penggunaan konfigurasi innodb_flush_method = O_DIRECT pada sistem operasi Linux dalam penyetelan subsistem I/O InnoDB?",
+    "o": [
+      "Membatasi laju operasi penulisan halaman kotor per detik agar tidak melampaui batas maksimal IOPS perangkat cakram mekanis lama",
+      "Menambah jumlah thread latar belakang paralel yang menangani antrean pembacaan read-ahead dan penulisan asinkron ke perangkat penyimpanan",
+      "Melakukan baca dan tulis halaman langsung ke perangkat disk tanpa melewati page cache sistem operasi sehingga mencegah double buffering",
+      "Mengubah ukuran standar blok halaman data dan indeks InnoDB dari 16 KB menjadi blok lebih besar setelah direktori data diinisialisasi"
+    ],
+    "a": 2,
+    "e": "Parameter innodb_flush_method = O_DIRECT memerintahkan InnoDB membaca dan menulis halaman langsung ke perangkat penyimpanan tanpa melewati page cache sistem operasi, sehingga mencegah pemborosan kapasitas RAM ganda (double buffering)."
+  },
+  {
+    "t": 10,
+    "q": "Mengapa pembagian area memori melalui parameter innodb_buffer_pool_instances bermanfaat pada server basis data dengan kapasitas Buffer Pool besar dan prosesor multi-core?",
+    "o": [
+      "Karena setiap partisi instance dialokasikan pada perangkat penyimpanan fisik terpisah sehingga mempercepat pemulihan saat kegagalan disk",
+      "Karena pembagian instance otomatis meningkatkan rasio ambang batas kesehatan Buffer Pool Hit-Ratio tanpa perlu menambah kapasitas RAM fisik",
+      "Karena setiap instance memisahkan penyimpanan tabel transaksional dari tabel analitik agar tidak memerlukan pemantauan variabel status",
+      "Karena setiap partisi memiliki daftar LRU dan kunci sinkronisasi (mutex) independen sehingga menghilangkan persaingan akses memori"
+    ],
+    "a": 3,
+    "e": "Parameter innodb_buffer_pool_instances (misalnya 8 instance apabila pool >= 8 GB) memecah Buffer Pool menjadi beberapa partisi independen dengan daftar LRU dan kunci (mutex) masing-masing untuk menghilangkan persaingan akses memori pada prosesor multi-core."
+  }
+];
+
+const TOPIK = {
+ "1": "Disk I/O dan prinsip optimasi",
+ "2": "Indeks: manfaat dan biaya pemeliharaan",
+ "3": "B+Tree dan pemrosesan kueri rentang",
+ "4": "Clustered Index InnoDB",
+ "5": "Secondary Index dan double lookup",
+ "6": "Indeks Hash dan Fulltext",
+ "7": "Fragmentasi dan OPTIMIZE TABLE",
+ "8": "UUIDv4 dan page split",
+ "9": "InnoDB Buffer Pool dan mekanisme LRU",
+ "10": "Konfigurasi I/O InnoDB"
+};
+
+/* ===================== KONFIGURASI ASESMEN ===================== */
+const CFG = {
+  JUMLAH_SOAL: 20,            // seluruh 20 soal PDF digunakan; urutannya diacak
+  MAKS_PELANGGARAN: 3,        // pelanggaran ke-3 = ujian dihentikan otomatis
+  DURASI_MENIT: 30,           // durasi tetap 30 menit
+  KKM: 70,                    // nilai >= KKM: selamat, < KKM: motivasi
+  TAMPILKAN_PEMBAHASAN: true, // false = kunci/pembahasan disembunyikan (disarankan sampai semua kelas selesai)
+  DAFTAR_NIM: [],             // contoh: ['2301001','2301002']; kosong = semua NIM diterima
+  HASH_DOSEN: 'd9facc103fb4e28ad641e715433fcfbe447efb6f90650cc314f3ec2613d7d160' // SHA-256 dari password dosen
+};
+
+/* ===================== VALIDASI BANK SOAL ===================== */
+const BANK_OK = Array.isArray(BANK_SOAL) && BANK_SOAL.length === 20 && BANK_SOAL.every(s =>
+  s && typeof s.q === 'string' && Array.isArray(s.o) && s.o.length === 4 &&
+  new Set(s.o).size === 4 && Number.isInteger(s.a) && s.a >= 0 && s.a < 4 && s.t in TOPIK && typeof s.e === 'string') && new Set(BANK_SOAL.map(s => s.q)).size === 20;
+
+/* ===================== PENYIMPANAN LOKAL ===================== */
+const K_RES = 'dba_assess.p9.v2.res', K_SES = 'dba_assess.p9.v2.ses.';
+const TAB = Math.random().toString(36).slice(2);
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
+const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
+const STORAGE_OK = (() => { try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); return true; } catch (e) { return false; } })();
+const normNim = s => String(s).trim().toUpperCase().replace(/\s+/g, '');
+
+function hasilSemua() {
+  const r = lsGet(K_RES, []);
+  return Array.isArray(r) ? r : [];
+}
+function sesiAktif() {
+  const out = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(K_SES)) { const s = lsGet(k, null); if (s && s.status === 'ongoing') out.push(s); }
+    }
+  } catch (e) {}
+  return out;
+}
+
+/* ===================== UTILITAS ===================== */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = s => document.querySelector(s);
+function rnd(n) { // acak seragam (tanpa modulo bias)
+  if (window.crypto && crypto.getRandomValues) {
+    const a = new Uint32Array(1), lim = Math.floor(4294967296 / n) * n; let x;
+    do { crypto.getRandomValues(a); x = a[0]; } while (x >= lim);
+    return x % n;
+  }
+  return Math.floor(Math.random() * n);
+}
+function perm(n) {
+  const a = [...Array(n).keys()];
+  for (let i = n - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+let toastT;
+function toast(m) {
+  const t = $('#toast'); t.textContent = m; t.style.display = 'block';
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 3200);
+}
+async function sha(s) {
+  if (!(window.crypto && crypto.subtle)) return null;
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+/* ===================== STATE & RENDER ===================== */
+let V = 'home', S = null, LAST = null, ticks = 0;
+
+function render(keep) {
+  if (V === 'summary' && !LAST) V = 'home';
+  document.body.classList.toggle('terkunci', V === 'quiz' && !!S && !!S.locked);
+  $('#hd').innerHTML = (V === 'quiz') ? hudQuiz() : hudHome();
+  $('#app').innerHTML = ({ home, quiz, summary, dosen })[V]();
+  if (!keep) window.scrollTo(0, 0);
+  tick();
+}
+function hudHome() {
+  return `<div class="in"><b class="lg"><span class="mk">DBA</span>ASESMEN DATABASE ADMINISTRATION</b></div>`;
+}
+function hudQuiz() {
+  return `<div class="in">
+    <b class="lg"><span class="mk">DBA</span>P9: OPTIMASI PERFORMA SISTEM</b>
+    <span class="pl">
+      <span id="tmr"></span>
+      <span>Pelanggaran: ${S.v}/${CFG.MAKS_PELANGGARAN}</span>
+      <span class="av">${esc(S.nama.charAt(0).toUpperCase())}</span>
+      <span>${esc(S.nama)} (${esc(S.nim)} - ${esc(S.kelas)})</span>
+    </span>
+  </div>`;
+}
+
+/* ===================== HALAMAN AWAL ===================== */
+function home() {
+  const n = Math.min(CFG.JUMLAH_SOAL, BANK_SOAL.length);
+  const galat = !BANK_OK ? 'Bank soal tidak valid. Hubungi dosen.' : (!STORAGE_OK ? 'Penyimpanan browser diblokir (mode privat?). Nonaktifkan lalu muat ulang halaman.' : '');
+  return `<div class="login">
+    <section class="card">
+      <h1><span class="hl">ASESMEN</span> DBA</h1>
+      <p class="sub" style="margin-bottom:2px;">Mata Kuliah : Database Administration</p>
+      <p class="sub">Pertemuan 9 : OPTIMASI PERFORMA SISTEM</p>
+      <div class="pesan info" style="font-size:.92rem">
+        <b>Aturan Asesmen</b><br>
+        • ${n} soal dikerjakan dalam waktu ${CFG.DURASI_MENIT} menit.<br>
+        • Tetap berada pada halaman ujian dan mode layar penuh. Jika layar penuh terlepas, ujian dikunci dan soal disembunyikan; klik di mana saja (atau tekan tombol apa pun) pada peringatan untuk kembali ke layar penuh secara otomatis. Pindah tab/aplikasi dan keluar layar penuh dicatat sebagai pelanggaran.<br>
+        • Pelanggaran ke-${CFG.MAKS_PELANGGARAN} akan menghentikan asesmen secara otomatis.<br>
+        • Mahasiswa mendapatkan 1 (satu) kesempatan melakukan asesmen.<br>
+        • Penjelasan jawaban benar ditampilkan setelah jawaban dikumpulkan.
+      </div>
+      ${galat ? `<p class="dlg-err">${esc(galat)}</p>` : ''}
+      <div>
+        <label for="nama">Nama Lengkap</label>
+        <input id="nama" maxlength="50" placeholder="Masukkan Nama Lengkap Anda..." autocomplete="off">
+        <label for="nim">NIM (Nomor Induk Mahasiswa)</label>
+        <input id="nim" maxlength="20" placeholder="Masukkan NIM Anda..." autocomplete="off">
+        <label for="kelas">Pilihan Kelas</label>
+        <select id="kelas">
+          <option value="">-- Pilih Kelas --</option>
+          <option value="TIF3A">TIF3A</option>
+          <option value="TIF3B">TIF3B</option>
+        </select>
+        <button class="btn" style="width:100%; min-height:50px; margin-top:10px;" onclick="mulaiUjian()" ${galat ? 'disabled' : ''}>Mulai Asesmen</button>
+      </div>
+    </section>
+    <section class="card" style="text-align:center;">
+      <h3>Portal Dosen Pengampu</h3>
+      <p style="color:var(--slate-500); font-size:.9rem; margin-bottom:12px;">Unduh rekapitulasi nilai CSV/Excel atau kelola data mahasiswa.</p>
+      <button class="btn alt" onclick="bukaAreaDosen()">Akses Area Dosen</button>
+    </section>
+  </div>`;
+}
+function blokir(pesan) { dlg({ judul: 'Tidak Dapat Memulai Asesmen', pesan, info: true }); }
+
+function mulaiUjian() {
+  if (!STORAGE_OK || !BANK_OK) return toast('Sistem belum siap. Hubungi dosen.');
+  const el = { nama: $('#nama'), nim: $('#nim'), kelas: $('#kelas') };
+  Object.values(el).forEach(e => e.classList.remove('input-error'));
+  const nama = el.nama.value.trim().replace(/\s+/g, ' ');
+  const nim = normNim(el.nim.value), kelas = el.kelas.value;
+  if (!nama) { el.nama.classList.add('input-error'); return toast('PERINGATAN: Nama Lengkap wajib diisi!'); }
+  if (!nim) { el.nim.classList.add('input-error'); return toast('PERINGATAN: NIM wajib diisi!'); }
+  if (!/^[A-Z0-9._-]{4,20}$/.test(nim)) { el.nim.classList.add('input-error'); return toast('NIM tidak valid (4–20 karakter huruf/angka).'); }
+  if (!kelas) { el.kelas.classList.add('input-error'); return toast('PERINGATAN: Silakan pilih Kelas TIF3A atau TIF3B!'); }
+  if (CFG.DAFTAR_NIM.length && !CFG.DAFTAR_NIM.map(normNim).includes(nim)) return blokir('NIM tidak terdaftar sebagai peserta asesmen ini.');
+
+  const ses = lsGet(K_SES + nim, null);
+  if (hasilSemua().some(r => normNim(r.nim) === nim) || (ses && ses.status === 'final'))
+    return blokir('Asesmen untuk NIM ini sudah tercatat dan tidak dapat diulang.\nJika ada kendala teknis, hubungi dosen pengampu.');
+
+  if (ses && ses.status === 'ongoing') { // lanjutkan sesi yang terputus
+    if (ses.tab !== TAB && Date.now() - ses.hb < 6000)
+      return blokir('Sesi ujian untuk NIM ini sedang aktif di tab/jendela lain.\nJika baru memuat ulang halaman, tunggu ±10 detik lalu coba lagi.');
+    S = { ...ses, tab: TAB, locked: false, done: false, lastV: 0, fsOk: false, noFS: false };
+    if (S.endAt && Date.now() >= S.endAt) { selesaikan('waktu'); return; }
+    S.v++; S.log.push({ t: Date.now(), r: 'Keluar atau memuat ulang halaman ujian' });
+    if (!saveSes()) return toast('Gagal menyimpan sesi. Hubungi dosen.');
+    if (S.v >= CFG.MAKS_PELANGGARAN) { selesaikan('dihentikan'); return; }
+    mulaiSesi(); S.locked = true; tampilPeringatan(S.log[S.log.length - 1].r);
+    return;
+  }
+
+  const n = Math.min(CFG.JUMLAH_SOAL, BANK_SOAL.length);
+  const soal = pilihSoal(n).map(i => {
+    const it = BANK_SOAL[i];
+    const op = perm(it.o.length).map(p => ({ t: it.o[p], c: p === it.a }));
+    return { id: i, tp: it.t, q: it.q, o: op.map(x => x.t), a: op.findIndex(x => x.c), e: it.e };
+  });
+  const now = Date.now();
+  S = { nama, nim, kelas, soal, ans: new Array(n).fill(null), idx: 0, v: 0, log: [], start: now,
+        endAt: CFG.DURASI_MENIT ? now + CFG.DURASI_MENIT * 60000 : 0, status: 'ongoing', tab: TAB, hb: now,
+        locked: false, done: false, lastV: 0, fsOk: false, noFS: false };
+  if (!saveSes()) { S = null; return toast('Gagal menyimpan sesi ujian. Ujian tidak dapat dimulai.'); }
+  mulaiSesi();
+}
+/* Semua 20 butir PDF digunakan. Fisher–Yates mengacak urutan soal pada setiap sesi. */
+function pilihSoal(n) {
+  return perm(BANK_SOAL.length).slice(0, Math.min(n, BANK_SOAL.length));
+}
+function mulaiSesi() {
+  V = 'quiz';
+  pasangGuard();
+  render();
+  mintaFullScreen().then(ok => {
+    if (!ok && S && !S.done && !S.locked) {
+      S.locked = true; render(true);
+      tampilGerbangFullscreen();
+    }
+  });
+}
+function tampilGerbangFullscreen() {
+  const d = $('#dlg');
+  d.hidden = false;
+  d.innerHTML = `<div class="dlg-box warn" role="alertdialog" aria-modal="true">
+    <h3>Mode Layar Penuh Diperlukan</h3>
+    <p>Browser belum mengaktifkan mode layar penuh. Ujian dikunci sampai mode layar penuh berhasil diaktifkan.</p>
+    <p id="w-status" class="dlg-err" aria-live="polite">Klik tombol di bawah untuk mengaktifkan fullscreen.</p>
+    <button class="btn" id="w-ok" style="width:100%">Aktifkan Fullscreen</button></div>`;
+  $('#w-ok').onclick = pulihkanFullscreen;
+  $('#w-ok').focus();
+}
+function saveSes() {
+  if (!S) return false;
+  const { locked, done, lastV, fsOk, noFS, w5, ...p } = S;
+  return lsSet(K_SES + S.nim, p);
+}
+
+/* ===================== ANTI-CURANG (MAKS. 3 PERINGATAN) ===================== */
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+const fsDidukung = () => { const d = document.documentElement; return !!(d.requestFullscreen || d.webkitRequestFullscreen); };
+const tunggu = ms => new Promise(r => setTimeout(r, ms));
+async function reqFS() {
+  if (fsEl()) return true;
+  const d = document.documentElement;
+  try {
+    if (d.requestFullscreen) await d.requestFullscreen({ navigationUI: 'hide' });
+    else if (d.webkitRequestFullscreen) await d.webkitRequestFullscreen();
+  } catch (err) { return !!fsEl(); }
+  for (let i = 0; i < 8 && !fsEl(); i++) await tunggu(60); // Safari lama: status fullscreen menyusul
+  return !!fsEl();
+}
+async function mintaFullScreen() {
+  if (!fsDidukung()) { if (S) { S.noFS = true; S.fsOk = false; } return true; } // perangkat tanpa Fullscreen API (mis. iPhone): tidak dapat dipaksakan
+  const ok = await reqFS();
+  if (S) S.fsOk = ok;
+  return ok;
+}
+const onFsChange = () => {
+  if (fsEl()) { if (S) S.fsOk = true; return; }
+  if (S && !S.done && S.fsOk) { S.fsOk = false; pelanggaran('Keluar dari mode layar penuh'); }
+};
+const GUARD = [
+  [window, 'blur', () => pelanggaran('Meninggalkan jendela ujian')],
+  [document, 'visibilitychange', () => { if (document.hidden) pelanggaran('Berpindah tab atau aplikasi lain'); }],
+  [document, 'fullscreenchange', onFsChange],
+  [document, 'webkitfullscreenchange', onFsChange],
+  [document, 'copy', e => { if (V === 'quiz') { e.preventDefault(); pelanggaran('Mencoba menyalin teks'); } }],
+  [document, 'cut', e => { if (V === 'quiz') { e.preventDefault(); pelanggaran('Mencoba memotong teks'); } }],
+  [document, 'paste', e => { if (V === 'quiz') { e.preventDefault(); pelanggaran('Mencoba menempel teks'); } }],
+  [document, 'contextmenu', e => { if (V === 'quiz') { e.preventDefault(); toast('Klik kanan dinonaktifkan selama ujian.'); } }],
+  [document, 'selectstart', e => { if (V === 'quiz' && e.target.closest && e.target.closest('.noselect')) e.preventDefault(); }],
+  [window, 'beforeprint', () => pelanggaran('Mencoba mencetak halaman')],
+  [window, 'beforeunload', e => { if (V === 'quiz' && S && !S.done) { e.preventDefault(); e.returnValue = ''; } }],
+  [document, 'keydown', e => {
+    if (V !== 'quiz') return;
+    const k = String(e.key).toLowerCase(), c = e.ctrlKey || e.metaKey;
+    if (k === 'f12' || (c && e.shiftKey && ['i', 'j', 'c'].includes(k)) || (c && ['u', 's', 'p'].includes(k))) {
+      e.preventDefault(); pelanggaran('Mencoba membuka alat pengembang, menyimpan, atau mencetak');
+    } else if (c && ['c', 'v', 'x'].includes(k)) { e.preventDefault(); pelanggaran('Mencoba menyalin atau menempel teks'); }
+  }],
+  [document, 'keyup', e => { if (V === 'quiz' && e.key === 'PrintScreen') pelanggaran('Mencoba tangkapan layar'); }]
+];
+function pasangGuard() { lepasGuard(); GUARD.forEach(([t, ev, fn]) => t.addEventListener(ev, fn)); }
+function lepasGuard() { GUARD.forEach(([t, ev, fn]) => t.removeEventListener(ev, fn)); }
+
+function pelanggaran(alasan) {
+  if (V !== 'quiz' || !S || S.done || S.locked) return;
+  const now = Date.now();
+  if (now - S.lastV < 1200) return;      // satu kejadian fisik = satu pelanggaran (blur+visibility+fullscreen)
+  S.lastV = now; S.v++; S.log.push({ t: now, r: alasan }); saveSes();
+  if (S.v >= CFG.MAKS_PELANGGARAN) { selesaikan('dihentikan'); return; }
+  S.locked = true; render(true); tampilPeringatan(alasan);
+}
+function tampilPeringatan(alasan) {
+  const n = S.v, sisa = CFG.MAKS_PELANGGARAN - n, d = $('#dlg');
+  document.body.classList.add('terkunci');
+  d.hidden = false; d.onkeydown = null;
+  d.innerHTML = `<div class="dlg-box warn" role="alertdialog" aria-modal="true" aria-labelledby="w-title">
+    <h3 id="w-title">⚠️ PERINGATAN ${n} dari ${CFG.MAKS_PELANGGARAN}</h3>
+    <p><b>${esc(alasan)}</b> terdeteksi dan dicatat untuk dosen.</p>
+    <p>Sisa kesempatan: <b>${sisa}</b>. Pada pelanggaran ke-${CFG.MAKS_PELANGGARAN}, ujian dihentikan otomatis dan Anda <b>tidak dapat mengulang</b>.</p>
+    <p id="w-status" class="dlg-err" aria-live="polite">Soal disembunyikan. Klik di mana saja atau tekan tombol apa pun untuk kembali ke layar penuh.</p>
+    <button class="btn" id="w-ok" style="width:100%">Kembali ke Fullscreen dan Lanjutkan</button></div>`;
+  aktifkanPemulih();
+  $('#w-ok').focus();
+  if (!fsEl() && !S.noFS) reqFS().then(ok => { if (ok && S && !S.done) { S.fsOk = true; const st = $('#w-status'); if (st) st.textContent = 'Layar penuh sudah aktif kembali. Klik tombol di bawah untuk melanjutkan ujian.'; } });
+}
+function tampilGerbangFullscreen() {
+  const d = $('#dlg');
+  document.body.classList.add('terkunci');
+  d.hidden = false; d.onkeydown = null;
+  d.innerHTML = `<div class="dlg-box warn" role="alertdialog" aria-modal="true">
+    <h3>Mode Layar Penuh Diperlukan</h3>
+    <p>Browser belum mengaktifkan mode layar penuh. Ujian dikunci sampai mode layar penuh berhasil diaktifkan.</p>
+    <p id="w-status" class="dlg-err" aria-live="polite">Klik di mana saja atau tekan tombol apa pun untuk mengaktifkan fullscreen.</p>
+    <button class="btn" id="w-ok" style="width:100%">Aktifkan Fullscreen</button></div>`;
+  aktifkanPemulih();
+  $('#w-ok').focus();
+}
+/* Browser hanya mengizinkan fullscreen dari interaksi pengguna, sehingga SEMUA klik/sentuhan/tombol
+   selama ujian terkunci langsung dipakai untuk memulihkan layar penuh (tidak hanya klik tombol). */
+let pemulihFn = null, sedangPulih = false;
+function aktifkanPemulih() {
+  lepasPemulih();
+  pemulihFn = e => { if (e.type === 'keydown' && (e.key === 'Escape' || e.key === 'F11')) return; pulihkanFullscreen(); };
+  ['mousedown', 'touchend', 'keydown'].forEach(t => document.addEventListener(t, pemulihFn, true));
+}
+function lepasPemulih() {
+  if (pemulihFn) ['mousedown', 'touchend', 'keydown'].forEach(t => document.removeEventListener(t, pemulihFn, true));
+  pemulihFn = null;
+}
+async function pulihkanFullscreen() {
+  if (!S || S.done || !S.locked || sedangPulih) return;
+  sedangPulih = true;
+  const btn = $('#w-ok'), status = $('#w-status'), d = $('#dlg');
+  if (btn) btn.disabled = true;
+  if (status) status.textContent = 'Memulihkan mode layar penuh...';
+  const ok = S.noFS ? true : await reqFS();
+  sedangPulih = false;
+  if (!S || S.done) return;
+  if (!ok) {
+    if (status) status.textContent = 'Mode layar penuh belum aktif. Klik sekali lagi dan izinkan browser mengaktifkannya.';
+    if (btn) btn.disabled = false;
+    return;
+  }
+  S.fsOk = !S.noFS;
+  S.lastV = Date.now();
+  S.locked = false;
+  lepasPemulih();
+  d.hidden = true; d.innerHTML = '';
+  render(true);
+}
+/* Penjaga cadangan: bila event fullscreenchange terlewat, keluar dari layar penuh tetap terdeteksi */
+setInterval(() => {
+  if (V === 'quiz' && S && !S.done && !S.noFS && !S.locked && S.fsOk && !fsEl()) { S.fsOk = false; pelanggaran('Keluar dari mode layar penuh'); }
+}, 400);
+function tick() {
+  if (V !== 'quiz' || !S || S.done) return;
+  const el = $('#tmr');
+  if (!CFG.DURASI_MENIT || !S.endAt) { if (el) el.textContent = ''; return; }
+  const sisa = S.endAt - Date.now();
+  if (sisa <= 0) { selesaikan('waktu'); return; }
+  if (el) {
+    el.textContent = '⏱ ' + String(Math.floor(sisa / 60000)).padStart(2, '0') + ':' + String(Math.floor(sisa % 60000 / 1000)).padStart(2, '0');
+    el.style.color = sisa < 60000 ? '#fecdd3' : '#fff';
+    if (sisa < 300000 && !S.w5) { S.w5 = true; toast('Sisa waktu kurang dari 5 menit.'); }
+  }
+}
+setInterval(() => {
+  if (V === 'quiz' && S && !S.done) { tick(); if (++ticks % 3 === 0 && S && !S.done) { S.hb = Date.now(); saveSes(); } }
+}, 1000);
+
+/* ===================== HALAMAN UJIAN ===================== */
+function quiz() {
+  const q = S.soal[S.idx], total = S.soal.length, max = CFG.MAKS_PELANGGARAN;
+  return `<section class="card noselect">
+    ${S.v > 0 ? `<div class="anti-cheat-alert">⚠️ PERINGATAN ${S.v} dari ${max}: ${esc(S.log[S.log.length - 1].r)}. Pelanggaran ke-${max} menghentikan ujian otomatis.</div>` : ''}
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="chip ok">Soal Ke ${S.idx + 1} dari ${total}</span>
+      <span style="font-size:.88rem; font-weight:700; color:var(--slate-500);">Bobot: ${Math.round(10000 / total) / 100} Poin / Soal</span>
+    </div>
+    <div class="stp">${S.soal.map((_, i) => `<span class="${i === S.idx ? 'on' : (S.ans[i] !== null ? 'dn' : '')}" onclick="gotoSoal(${i})">${i + 1}</span>`).join('')}</div>
+    <h3 style="font-size:1.15rem; line-height:1.5; margin:16px 0;">${S.idx + 1}. ${esc(q.q)}</h3>
+    <div>${q.o.map((opt, k) => `<button class="opt ${S.ans[S.idx] === k ? 'selected' : ''}" onclick="pilihJawaban(${k})"><i>${'ABCD'[k]}</i><span>${esc(opt)}</span></button>`).join('')}</div>
+    <div style="display:flex; justify-content:space-between; margin-top:24px;">
+      <button class="btn alt" onclick="prevSoal()" ${S.idx === 0 ? 'disabled' : ''}>&larr; Sebelumnya</button>
+      ${S.idx < total - 1 ? `<button class="btn" onclick="nextSoal()">Selanjutnya &rarr;</button>` : `<button class="btn danger" onclick="konfirmasiSelesai()">Kumpulkan Jawaban Selesai</button>`}
+    </div>
+  </section>`;
+}
+function pilihJawaban(k) { if (!S || S.done || S.locked) return; S.ans[S.idx] = k; saveSes(); render(true); }
+function gotoSoal(i) { if (!S || S.done || S.locked) return; S.idx = i; saveSes(); render(); }
+function prevSoal() { if (S.idx > 0) gotoSoal(S.idx - 1); }
+function nextSoal() { if (S.idx < S.soal.length - 1) gotoSoal(S.idx + 1); }
+function konfirmasiSelesai() {
+  if (!S || S.done || S.locked) return;
+  const kosong = S.ans.filter(a => a === null).length;
+  dlg({ judul: 'Kumpulkan Jawaban?',
+        pesan: (kosong ? `Masih ada ${kosong} soal yang belum dijawab.\n` : '') + 'Setelah dikumpulkan, jawaban tidak dapat diubah dan ujian tidak dapat diulang.',
+        tombol: 'Ya, Kumpulkan', aksi: () => selesaikan('manual') });
+}
+
+/* ===================== PENILAIAN ===================== */
+function buatHasil(s, mode) {
+  const total = s.soal.length;
+  const benar = s.soal.reduce((a, q, i) => a + (s.ans[i] === q.a ? 1 : 0), 0);
+  const kosong = s.ans.filter(a => a === null).length;
+  const status = { manual: 'Selesai', waktu: 'Selesai (waktu habis)', dihentikan: `Dihentikan otomatis (${CFG.MAKS_PELANGGARAN} pelanggaran)` }[mode];
+  return {
+    id: 'res_' + Date.now().toString(36), nama: s.nama, nim: s.nim, kelas: s.kelas,
+    benar, salah: total - benar - kosong, kosong, total, nilai: Math.round(benar / total * 100),
+    violations: s.v, log: s.log, status, mode, ts: Date.now(), durasi: Math.round((Date.now() - s.start) / 1000),
+    detail: s.soal.map((q, i) => ({ tp: q.tp, q: q.q, userAns: s.ans[i], correctAns: q.a, options: q.o, explain: q.e, isCorrect: s.ans[i] === q.a }))
+  };
+}
+function simpanHasil(rec) {
+  const nim = normNim(rec.nim);
+  const all = hasilSemua().filter(r => normNim(r.nim) !== nim); all.push(rec);
+  const ok = lsSet(K_RES, all);
+  lsSet(K_SES + nim, { status: 'final', nim, ts: rec.ts });
+  return ok;
+}
+function selesaikan(mode) {
+  if (!S || S.done) return;
+  S.done = true; S.locked = true;
+  const rec = buatHasil(S, mode);
+  rec.saveFail = !simpanHasil(rec);
+  lepasGuard(); lepasPemulih();
+  document.body.classList.remove('terkunci');
+  try { if (fsEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } } catch (e) {}
+  const d = $('#dlg'); d.hidden = true; d.innerHTML = '';
+  LAST = rec; V = 'summary'; render();
+}
+
+/* ===================== HALAMAN AKHIR ===================== */
+function pesanAkhir(r) {
+  return r.nilai >= CFG.KKM
+    ? { cls: 'ok', judul: '🎉 Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. Pertahankan semangat belajar Anda: biasakan memantau Buffer Pool, Slow Query Log, dan pemakaian indeks pada sistem nyata. Anda sedang menuju administrator basis data yang andal!` }
+    : { cls: 'semangat', judul: '💪 Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, tetapi ini bukan akhir. Setiap jawaban yang keliru adalah petunjuk bagian mana yang perlu diperkuat. Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging, diskusikan dengan teman atau dosen, lalu teruslah berlatih. Proses belajar yang gigih akan membuahkan hasil yang lebih baik!` };
+}
+function summary() {
+  const r = LAST, lulus = r.nilai >= CFG.KKM, m = pesanAkhir(r), stop = r.mode === 'dihentikan';
+  const review = CFG.TAMPILKAN_PEMBAHASAN && !stop;
+  return `<div class="login" style="max-width:800px;">
+    <section class="card">
+      <div class="summary-hero">
+        <h2>Hasil Asesmen Ujian</h2>
+        <p class="sub" style="margin-bottom:6px;">${esc(r.nama)} &bull; NIM: ${esc(r.nim)} &bull; Kelas: ${esc(r.kelas)}</p>
+        <span class="chip ${lulus ? 'ok' : 'bad'}" style="font-size:.9rem; padding:6px 18px;">${lulus ? 'LULUS EVALUASI' : 'PERLU REMEDIAL'}</span>
+      </div>
+      <div class="pesan ${m.cls}"><h3>${m.judul}</h3><p>${m.teks}</p></div>
+      ${stop ? `<div class="pesan info"><h3>⛔ Ujian Dihentikan Otomatis</h3><p>Terdeteksi ${r.violations} pelanggaran. Jawaban yang sudah terisi dinilai, keterangan pelanggaran diteruskan kepada dosen, dan asesmen tidak dapat diulang.</p></div>` : ''}
+      ${r.mode === 'waktu' ? `<div class="pesan info"><p>Waktu pengerjaan habis; jawaban terakhir Anda dikumpulkan otomatis.</p></div>` : ''}
+      ${r.saveFail ? `<div class="pesan info"><p><b>Hasil gagal tersimpan di perangkat ini.</b> Tangkap layar halaman ini dan tunjukkan kepada dosen.</p></div>` : ''}
+      <div class="stat-grid">
+        <div class="stat-box"><div class="val" style="color:var(--brand);">${r.nilai}</div><div class="lbl">Nilai Akhir</div></div>
+        <div class="stat-box"><div class="val" style="color:var(--g);">${r.benar}</div><div class="lbl">Jumlah Benar</div></div>
+        <div class="stat-box"><div class="val" style="color:var(--r);">${r.salah + r.kosong}</div><div class="lbl">Salah / Kosong</div></div>
+        <div class="stat-box"><div class="val">${r.violations}/${CFG.MAKS_PELANGGARAN}</div><div class="lbl">Pelanggaran Screen</div></div>
+      </div>
+      ${review ? `<h3 style="margin-top:24px; margin-bottom:12px;">Penjelasan Jawaban Benar</h3>
+      <div>${r.detail.map((it, i) => `
+        <div class="review-item" style="border-left:5px solid ${it.isCorrect ? 'var(--g)' : 'var(--r)'};">
+          <p style="font-size:.78rem; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:.03em;">${esc(TOPIK[it.tp] || '')}</p>
+          <p style="font-weight:700; color:var(--slate-900);">${i + 1}. ${esc(it.q)}</p>
+          <p style="margin:6px 0; font-size:.92rem;">Jawaban Anda: <b style="color:${it.isCorrect ? 'var(--g)' : 'var(--r)'};">${it.userAns !== null ? '(' + 'ABCD'[it.userAns] + ') ' + esc(it.options[it.userAns]) : 'Tidak Dijawab'}</b> ${it.isCorrect ? '✓ (Benar)' : '✗ (Salah)'}</p>
+          <p style="margin:4px 0; font-size:.92rem; color:var(--g-txt); font-weight:700;">Jawaban Benar: (${'ABCD'[it.correctAns]}) ${esc(it.options[it.correctAns])}</p>
+          <div style="background:var(--slate-100); padding:10px 14px; border-radius:8px; margin-top:8px; font-size:.88rem; color:var(--slate-700);">💡 <b>Penjelasan:</b> ${esc(it.explain)}</div>
+        </div>`).join('')}</div>` : ''}
+      <button class="btn" style="width:100%; margin-top:20px;" onclick="keHome()">Selesaikan & Keluar ke Tampilan Awal</button>
+    </section>
+  </div>`;
+}
+function keHome() { LAST = null; S = null; V = 'home'; render(); }
+
+/* ===================== AREA DOSEN ===================== */
+let gagalPin = 0, kunciSampai = 0;
+function bukaAreaDosen() {
+  dlg({
+    judul: 'Akses Password Area Dosen', pesan: 'Masukkan password Dosen Pengampu untuk mengakses rekapitulasi data:',
+    input: 'password', ph: 'Masukkan password...', tombol: 'Masuk Area Dosen',
+    cek: async v => {
+      if (Date.now() < kunciSampai) return `Terlalu banyak percobaan. Coba lagi dalam ${Math.ceil((kunciSampai - Date.now()) / 1000)} detik.`;
+      const h = await sha(v);
+      if (h === null) return 'Browser tidak mendukung verifikasi aman. Buka lewat HTTPS atau berkas lokal.';
+      if (h === CFG.HASH_DOSEN) { gagalPin = 0; return ''; }
+      if (++gagalPin >= 5) { kunciSampai = Date.now() + 60000; gagalPin = 0; }
+      return 'Password Dosen salah!';
+    },
+    aksi: () => {
+      sesiAktif().forEach(s => { // sesi terputus yang waktunya sudah habis dinilai otomatis
+        if (s.endAt && Date.now() > s.endAt && Date.now() - s.hb > 10000) simpanHasil(buatHasil(s, 'waktu'));
+      });
+      V = 'dosen'; render();
+    }
+  });
+}
+const ketCurang = x => x.violations > 0 ? `Terdeteksi (${x.violations}x Pelanggaran)${x.mode === 'dihentikan' ? ' - dihentikan otomatis' : ''}` : 'Tidak Ada';
+function dosen() {
+  const rs = hasilSemua().slice().sort((a, b) => (a.kelas + a.nama).localeCompare(b.kelas + b.nama));
+  const aktif = sesiAktif();
+  const avg = rs.length ? Math.round(rs.reduce((a, x) => a + x.nilai, 0) / rs.length * 10) / 10 : 0;
+  const lulus = rs.filter(x => x.nilai >= CFG.KKM).length, stop = rs.filter(x => x.mode === 'dihentikan').length;
+  const th = 'padding:10px;';
+  const aksi = nim => `<button class="btn alt" style="min-height:34px; padding:4px 12px; margin:0;" data-nim="${esc(nim)}" onclick="bukaKunci(this.dataset.nim)">Buka Kunci</button>`;
+  return `<div class="login" style="max-width:900px;">
+    <section class="card">
+      <h2>Portal Administrasi Dosen</h2>
+      <p style="color:var(--slate-600); margin-bottom:12px;">Data tersimpan di browser/perangkat ini saja.</p>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="val">${rs.length}</div><div class="lbl">Selesai</div></div>
+        <div class="stat-box"><div class="val">${aktif.length}</div><div class="lbl">Belum Selesai</div></div>
+        <div class="stat-box"><div class="val">${avg}</div><div class="lbl">Rata-rata</div></div>
+        <div class="stat-box"><div class="val">${lulus}/${rs.length}</div><div class="lbl">Nilai ≥ ${CFG.KKM}</div></div>
+        <div class="stat-box"><div class="val" style="color:var(--r);">${stop}</div><div class="lbl">Dihentikan</div></div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" onclick="expCSV()">📥 Unduh Rekap Excel/CSV</button>
+        <button class="btn alt" onclick="expJSON()">📄 Unduh Data JSON</button>
+        <button class="btn danger" onclick="resetSistem()">⚠️ Reset Data Sistem</button>
+      </div>
+      <h3 style="margin-top:24px;">Daftar Nilai Mahasiswa Ujian</h3>
+      ${rs.length + aktif.length === 0 ? '<p style="color:var(--slate-500);">Belum ada data ujian mahasiswa.</p>' : `
+      <div style="overflow-x:auto; margin-top:10px;">
+        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:.9rem;">
+          <thead><tr style="background:var(--slate-100); border-bottom:2px solid var(--slate-200);">
+            <th style="${th}">Nama</th><th style="${th}">NIM</th><th style="${th}">Kelas</th><th style="${th}">Nilai</th><th style="${th}">Status</th><th style="${th}">Keterangan Kecurangan</th><th style="${th}">Aksi</th>
+          </tr></thead>
+          <tbody>
+            ${rs.map(x => `<tr style="border-bottom:1px solid var(--slate-200);">
+              <td style="${th} font-weight:700;">${esc(x.nama)}</td><td style="${th}">${esc(x.nim)}</td><td style="${th}">${esc(x.kelas)}</td>
+              <td style="${th} font-weight:800; color:var(--brand);">${x.nilai}</td><td style="${th}">${esc(x.status || 'Selesai')}</td>
+              <td style="${th} font-weight:600; color:${x.violations > 0 ? 'var(--r)' : 'var(--g-txt)'};" title="${esc((x.log || []).map(l => l.r).join('; '))}">${esc(ketCurang(x))}</td>
+              <td style="${th}">${aksi(x.nim)}</td></tr>`).join('')}
+            ${aktif.map(x => `<tr style="border-bottom:1px solid var(--slate-200); background:var(--y-bg);">
+              <td style="${th} font-weight:700;">${esc(x.nama)}</td><td style="${th}">${esc(x.nim)}</td><td style="${th}">${esc(x.kelas)}</td>
+              <td style="${th}">-</td><td style="${th}">Belum selesai / terputus</td><td style="${th}">${x.v}x Pelanggaran</td><td style="${th}">${aksi(x.nim)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`}
+      <button class="btn alt" style="width:100%; margin-top:24px;" onclick="keHome()">Keluar Dari Area Dosen</button>
+    </section>
+  </div>`;
+}
+function bukaKunci(nim) {
+  dlg({ judul: 'Buka Kunci Peserta', pesan: `Hapus data NIM ${nim} agar dapat mengikuti asesmen sekali lagi? Nilai lama akan terhapus.`,
+        tombol: 'Buka Kunci', bahaya: true,
+        aksi: () => { const n = normNim(nim); lsSet(K_RES, hasilSemua().filter(r => normNim(r.nim) !== n)); lsDel(K_SES + n); render(true); toast('Kunci dibuka untuk NIM ' + nim); } });
+}
+const csvCell = c => { let s = String(c); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+function expCSV() {
+  const rs = hasilSemua(), aktif = sesiAktif();
+  if (!rs.length && !aktif.length) return toast('Belum ada data nilai mahasiswa untuk diunduh.');
+  const rows = [['Nama', 'NIM', 'Kelas', 'Nilai Akhir', 'Status', 'Keterangan Kecurangan']];
+  rs.forEach(x => rows.push([x.nama, x.nim, x.kelas, x.nilai, x.status || 'Selesai', ketCurang(x)]));
+  aktif.forEach(x => rows.push([x.nama, x.nim, x.kelas, '', 'Belum selesai / terputus', `${x.v}x Pelanggaran`]));
+  dlFile('Rekap_Nilai_DBA_Pertemuan9.csv', '\ufeff' + rows.map(r => r.map(csvCell).join(',')).join('\r\n'), 'text/csv');
+  toast('Rekap CSV Berhasil Diunduh!');
+}
+function expJSON() {
+  const rs = hasilSemua();
+  if (!rs.length) return toast('Belum ada data untuk diunduh.');
+  dlFile('Data_DBA_Pertemuan9.json', JSON.stringify({ p: rs }, null, 2), 'application/json');
+  toast('Data JSON Berhasil Diunduh!');
+}
+function resetSistem() {
+  dlg({ judul: 'Konfirmasi Reset Data', pesan: 'Seluruh data nilai dan sesi ujian di perangkat ini akan DIHAPUS.\n\nKetik HAPUS untuk mengonfirmasi.',
+        input: 'text', ph: 'Ketik HAPUS...', tombol: 'Hapus Semua Data', bahaya: true,
+        cek: v => v.trim() === 'HAPUS' ? '' : 'Ketik HAPUS dengan huruf besar!',
+        aksi: () => {
+          const ks = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && (k.startsWith('dba_assess.p9.'))) ks.push(k); } } catch (e) {}
+          ks.forEach(lsDel); render(true); toast('Seluruh data berhasil direset!');
+        } });
+}
+function dlFile(nama, t, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([t], { type: mime })); a.download = nama;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ===================== DIALOG SISTEM ===================== */
+function dlg(o) {
+  const d = $('#dlg');
+  d.innerHTML = `<div class="dlg-box" role="dialog" aria-modal="true">
+    <h3 style="margin-bottom:6px;">${esc(o.judul)}</h3>
+    <p style="font-size:.92rem; color:var(--slate-600); margin-bottom:12px;">${esc(o.pesan)}</p>
+    ${o.input ? `<input id="dlg-in" type="${o.input}" autocomplete="off" placeholder="${esc(o.ph || '')}">` : ''}
+    <p id="dlg-err" class="dlg-err"></p>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn alt" id="dlg-no">${o.info ? 'Tutup' : 'Batal'}</button>
+      ${o.info ? '' : `<button class="btn ${o.bahaya ? 'danger' : ''}" id="dlg-ok">${esc(o.tombol)}</button>`}
+    </div></div>`;
+  d.hidden = false;
+  const inp = $('#dlg-in'), ok = $('#dlg-ok');
+  const tutup = () => { d.hidden = true; d.innerHTML = ''; d.onkeydown = null; };
+  let sibuk = false;
+  $('#dlg-no').onclick = tutup;
+  if (ok) ok.onclick = async () => {
+    if (sibuk) return; sibuk = true;
+    const err = o.cek ? await o.cek(inp ? inp.value : '') : '';
+    if (err) { $('#dlg-err').textContent = err; sibuk = false; return; }
+    tutup(); o.aksi();
+  };
+  d.onkeydown = ev => { if (ev.key === 'Escape') tutup(); else if (ev.key === 'Enter' && ok) ok.click(); };
+  (inp || ok || $('#dlg-no')).focus();
+}
+
+render();
+</script>
+</body>
+</html>
