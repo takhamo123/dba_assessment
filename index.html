@@ -760,8 +760,8 @@ function home() {
         <label for="kelas">Pilihan Kelas</label>
         <select id="kelas">
           <option value="">-- Pilih Kelas --</option>
-          <option value="TIF3A">TIF3A</option>
-          <option value="TIF3B">TIF3B</option>
+          <option value="TIFA3">TIFA3</option>
+          <option value="TIFB3">TIFB3</option>
         </select>
         <button class="btn" style="width:100%; min-height:50px; margin-top:10px;" onclick="mulaiUjian()" ${galat ? 'disabled' : ''}>Mulai Asesmen</button>
       </div>
@@ -784,7 +784,7 @@ function mulaiUjian() {
   if (!nama) { el.nama.classList.add('input-error'); return toast('PERINGATAN: Nama Lengkap wajib diisi!'); }
   if (!nim) { el.nim.classList.add('input-error'); return toast('PERINGATAN: NIM wajib diisi!'); }
   if (!/^[A-Z0-9._-]{4,20}$/.test(nim)) { el.nim.classList.add('input-error'); return toast('NIM tidak valid (4–20 karakter huruf/angka).'); }
-  if (!kelas) { el.kelas.classList.add('input-error'); return toast('PERINGATAN: Silakan pilih Kelas TIF3A atau TIF3B!'); }
+  if (!kelas) { el.kelas.classList.add('input-error'); return toast('PERINGATAN: Silakan pilih Kelas TIFA3 atau TIFB3!'); }
   if (CFG.DAFTAR_NIM.length && !CFG.DAFTAR_NIM.map(normNim).includes(nim)) return blokir('NIM tidak terdaftar sebagai peserta asesmen ini.');
 
   const ses = lsGet(K_SES + nim, null);
