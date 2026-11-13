@@ -747,10 +747,9 @@ function home() {
       <div class="pesan info" style="font-size:.92rem">
         <b>Aturan Asesmen</b><br>
         • ${n} soal dikerjakan dalam waktu ${CFG.DURASI_MENIT} menit.<br>
-        • Tetap berada pada halaman ujian dan mode layar penuh. Jika layar penuh terlepas, ujian dikunci dan soal disembunyikan; klik di mana saja (atau tekan tombol apa pun) pada peringatan untuk kembali ke layar penuh secara otomatis. Pindah tab/aplikasi dan keluar layar penuh dicatat sebagai pelanggaran.<br>
+        • Pindah atau keluar dari layar dicatat sebagai pelanggaran.<br>
         • Pelanggaran ke-${CFG.MAKS_PELANGGARAN} akan menghentikan asesmen secara otomatis.<br>
         • Mahasiswa mendapatkan 1 (satu) kesempatan melakukan asesmen.<br>
-        • Penjelasan jawaban benar ditampilkan setelah jawaban dikumpulkan.
       </div>
       ${galat ? `<p class="dlg-err">${esc(galat)}</p>` : ''}
       <div>
@@ -1049,8 +1048,8 @@ function selesaikan(mode) {
 /* ===================== HALAMAN AKHIR ===================== */
 function pesanAkhir(r) {
   return r.nilai >= CFG.KKM
-    ? { cls: 'ok', judul: '🎉 Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. Pertahankan semangat belajar Anda: biasakan memantau Buffer Pool, Slow Query Log, dan pemakaian indeks pada sistem nyata. Anda sedang menuju administrator basis data yang andal!` }
-    : { cls: 'semangat', judul: '💪 Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, tetapi ini bukan akhir. Setiap jawaban yang keliru adalah petunjuk bagian mana yang perlu diperkuat. Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging, diskusikan dengan teman atau dosen, lalu teruslah berlatih. Proses belajar yang gigih akan membuahkan hasil yang lebih baik!` };
+    ? { cls: 'ok', judul: 'Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. ` }
+    : { cls: 'semangat', judul: 'Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging!` };
 }
 function summary() {
   const r = LAST, lulus = r.nilai >= CFG.KKM, m = pesanAkhir(r), stop = r.mode === 'dihentikan';
@@ -1081,7 +1080,7 @@ function summary() {
           <p style="margin:4px 0; font-size:.92rem; color:var(--g-txt); font-weight:700;">Jawaban Benar: (${'ABCD'[it.correctAns]}) ${esc(it.options[it.correctAns])}</p>
           <div style="background:var(--slate-100); padding:10px 14px; border-radius:8px; margin-top:8px; font-size:.88rem; color:var(--slate-700);">💡 <b>Penjelasan:</b> ${esc(it.explain)}</div>
         </div>`).join('')}</div>` : ''}
-      <button class="btn" style="width:100%; margin-top:20px;" onclick="keHome()">Selesaikan & Keluar ke Tampilan Awal</button>
+      <button class="btn" style="width:100%; margin-top:20px;" onclick="keHome()">Selesai & Keluar ke Tampilan Awal</button>
     </section>
   </div>`;
 }
