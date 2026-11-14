@@ -863,11 +863,9 @@ function home() {
       <div class="pesan info" style="font-size:.92rem">
         <b>Aturan Asesmen</b><br>
         • ${n} soal dikerjakan dalam waktu ${CFG.DURASI_MENIT} menit.<br>
-        • Tetap berada pada halaman ujian dan mode layar penuh. Jika layar penuh terlepas, ujian dikunci dan soal disembunyikan; klik di mana saja (atau tekan tombol apa pun) pada peringatan untuk kembali ke layar penuh secara otomatis. Pindah tab/aplikasi dan keluar layar penuh dicatat sebagai pelanggaran.<br>
+        • Pindah tab/aplikasi atau keluar layar akan dicatat sebagai pelanggaran.<br>
         • Pelanggaran ke-${CFG.MAKS_PELANGGARAN} akan menghentikan asesmen secara otomatis.<br>
         • Mahasiswa mendapatkan 1 (satu) kesempatan melakukan asesmen.<br>
-        • Penjelasan jawaban benar ditampilkan setelah jawaban dikumpulkan.<br>
-        • Jawaban dikirim otomatis ke dosen. Pastikan internet aktif selama asesmen dan hingga muncul tanda &ldquo;terkirim&rdquo;.
       </div>
       ${galat ? `<p class="dlg-err">${esc(galat)}</p>` : ''}
       <div id="outnote">${outNoteHtml()}</div>
