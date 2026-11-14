@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0f172a">
-<title>ASESMEN DATABASE ADMINISTRATION — Pertemuan 9</title>
+<title>ASESMEN DATABASE ADMINISTRATION</title>
 <style>
 :root {
   --slate-900: #0f172a;
@@ -857,9 +857,9 @@ function home() {
   const galat = !BANK_OK ? 'Bank soal tidak valid. Hubungi dosen.' : (!STORAGE_OK ? 'Penyimpanan browser diblokir (mode privat?). Nonaktifkan lalu muat ulang halaman.' : ((CFG.WAJIB_SERVER && !CLOUD_ON) ? 'Server penyimpanan hasil belum dikonfigurasi. Hubungi dosen.' : ''));
   return `<div class="login">
     <section class="card">
-      <h1><span class="hl">ASESMEN</span> DBA</h1>
+      <h1><span class="hl">OPTIMASI PERFORMA SISTEM</span></h1>
       <p class="sub" style="margin-bottom:2px;">Mata Kuliah : Database Administration</p>
-      <p class="sub">Pertemuan 9 : OPTIMASI PERFORMA SISTEM</p>
+      
       <div class="pesan info" style="font-size:.92rem">
         <b>Aturan Asesmen</b><br>
         • ${n} soal dikerjakan dalam waktu ${CFG.DURASI_MENIT} menit.<br>
@@ -1208,8 +1208,8 @@ function selesaikan(mode) {
 /* ===================== HALAMAN AKHIR ===================== */
 function pesanAkhir(r) {
   return r.nilai >= CFG.KKM
-    ? { cls: 'ok', judul: '🎉 Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. Pertahankan semangat belajar Anda: biasakan memantau Buffer Pool, Slow Query Log, dan pemakaian indeks pada sistem nyata. Anda sedang menuju administrator basis data yang andal!` }
-    : { cls: 'semangat', judul: '💪 Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, tetapi ini bukan akhir. Setiap jawaban yang keliru adalah petunjuk bagian mana yang perlu diperkuat. Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging, diskusikan dengan teman atau dosen, lalu teruslah berlatih. Proses belajar yang gigih akan membuahkan hasil yang lebih baik!` };
+    ? { cls: 'ok', judul: '🎉 Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem.` }
+    : { cls: 'semangat', judul: '💪 Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM} Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging.` };
 }
 function summary() {
   const r = LAST, lulus = r.nilai >= CFG.KKM, m = pesanAkhir(r), stop = r.mode === 'dihentikan';
