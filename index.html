@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0f172a">
-<title>ASESMEN DATABASE ADMINISTRATION</title>
+<title>ASESMEN DATABASE ADMINISTRATION — Pertemuan 9</title>
 <style>
 :root {
   --slate-900: #0f172a;
@@ -375,6 +375,17 @@ input:focus, select:focus {
 .hud .pl{flex-wrap:wrap;justify-content:flex-end}
 body.terkunci #app{filter:blur(14px);pointer-events:none;-webkit-user-select:none;user-select:none}
 .dlg-box.warn{box-shadow:0 0 0 9999px rgba(15,23,42,.35),var(--shadow-lg)}
+.dlg-box{max-height:90vh;overflow:auto}
+.net{font-size:.76rem;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(16,185,129,.2);color:#6ee7b7;white-space:nowrap}
+.net.off{background:rgba(225,29,72,.25);color:#fecdd3}
+.chip.warn{background:var(--y-bg);color:var(--y-txt);border:1px solid var(--y-border)}
+.chip.info{background:var(--brand-light);color:var(--brand);border:1px solid var(--brand-border)}
+.dtbl{width:100%;border-collapse:collapse;text-align:left;font-size:.88rem}
+.dtbl th{padding:10px;background:var(--slate-100);border-bottom:2px solid var(--slate-200);white-space:nowrap}
+.dtbl td{padding:9px 10px;border-bottom:1px solid var(--slate-200);vertical-align:middle}
+.dtbl tr.aktif{background:#f8fbff}
+.dtbl tr.putus{background:var(--y-bg)}
+.mini{min-height:34px;padding:4px 12px;margin:0 6px 0 0;font-size:.82rem}
 @media print{body{display:none!important}}
 </style>
 </head>
@@ -417,7 +428,7 @@ const BANK_SOAL = [
     "q": "Bagaimana konsekuensi arsitektural (trade-off) dari penambahan struktur indeks sekunder terhadap kinerja operasi basis data?",
     "o": [
       "Mempercepat penelusuran baris pada operasi pembacaan (SELECT), tetapi menambah konsumsi ruang penyimpanan serta beban penulisan (write overhead)",
-      "Mempercepat seluruh operasi penyisipan baris baru (INSERT), tetapi memperlambat pemindaian rentang nilai pada kueri pembacaan terurut",
+      "Mempercepat seluruh operasi penyisipan baris baru (INSERT), tetapi memperlambat pemindaian rentang nilai pada kueri pembacaan terurut pada tabel besar",
       "Menghilangkan kebutuhan alokasi memori pada InnoDB Buffer Pool, tetapi memaksa setiap kueri melakukan pemindaian penuh seluruh tabel",
       "Mengurangi ukuran berkas tablespace di media penyimpanan, tetapi menonaktifkan konsistensi kunci primer saat terjadi pembaruan data"
     ],
@@ -429,7 +440,7 @@ const BANK_SOAL = [
     "q": "Pada indeks komposit B+Tree dengan urutan kolom (kode_fakultas, tahun_terbit), mengapa kueri dengan klausa WHERE tahun_terbit = 2025 tidak dapat menelusuri pohon indeks secara optimal?",
     "o": [
       "Karena kolom bertipe bilangan bulat tidak pernah disimpan di dalam simpul daun struktur B+Tree pada mesin penyimpanan InnoDB",
-      "Karena mesin InnoDB hanya mengizinkan satu kolom kunci digunakan sebagai kondisi penyaringan pada setiap eksekusi kueri tunggal",
+      "Karena mesin InnoDB hanya mengizinkan satu kolom kunci digunakan sebagai kondisi penyaringan pada setiap eksekusi kueri tunggal dalam satu sesi koneksi aktif",
       "Karena nilai tahun terbit selalu dipetakan menggunakan fungsi hash acak sehingga urutan kronologisnya hilang di dalam pohon indeks",
       "Karena entri indeks komposit diurutkan mulai dari kolom awalan paling kiri (leftmost prefix), sehingga pencarian tanpa kolom pertama tidak terarah"
     ],
@@ -466,8 +477,8 @@ const BANK_SOAL = [
     "o": [
       "Karena simpul daun Secondary Index hanya menyimpan nomor blok halaman disk yang harus diverifikasi ulang melalui kamus data sistem",
       "Karena mesin InnoDB wajib membandingkan hasil pencarian Secondary Index dengan isi Hash Index untuk memastikan keunikan setiap baris",
-      "Karena simpul daun Secondary Index hanya menyimpan nilai kolom terindeks beserta Primary Key, sehingga sisa kolom harus diambil dari Clustered Index",
-      "Karena setiap pembacaan melalui Secondary Index otomatis memicu penyusunan ulang seluruh halaman daun sebelum baris dikirim ke aplikasi"
+      "Karena simpul daun Secondary Index hanya menyimpan nilai kolom terindeks beserta Primary Key, sehingga kolom lainnya diambil dari Clustered Index",
+      "Karena setiap pembacaan melalui Secondary Index otomatis memicu penyusunan ulang seluruh halaman daun sebelum baris dikirim ke aplikasi pada tiap kueri"
     ],
     "a": 2,
     "e": "Simpul daun Secondary Index menyimpan nilai kolom yang diindeks dan salinan Primary Key baris tersebut. Jika kueri membutuhkan kolom lain di luar indeks, InnoDB melakukan pencarian kedua (bookmark lookup) menuju Clustered Index."
@@ -500,7 +511,7 @@ const BANK_SOAL = [
     "t": 6,
     "q": "Apa perbedaan mendasar antara penggunaan indeks HASH eksplisit pada mesin MEMORY dengan fitur Adaptive Hash Index (AHI) pada mesin InnoDB?",
     "o": [
-      "Indeks HASH eksplisit hanya mendukung pemindaian rentang berurutan, sedangkan Adaptive Hash Index khusus melayani pencarian teks semantik",
+      "Indeks HASH eksplisit hanya mendukung pemindaian rentang berurutan, sedangkan Adaptive Hash Index khusus melayani pencarian teks semantik pada seluruh kolom",
       "Indeks HASH eksplisit didefinisikan pada skema tabel oleh pengguna, sedangkan Adaptive Hash Index dikelola otomatis secara internal oleh InnoDB",
       "Indeks HASH eksplisit tersimpan permanen di dalam berkas tablespace disk, sedangkan Adaptive Hash Index ditulis ke berkas log transaksi",
       "Indeks HASH eksplisit digunakan untuk menyusun fisik baris tabel utama, sedangkan Adaptive Hash Index menggantikan fungsi kunci primer"
@@ -539,7 +550,7 @@ const BANK_SOAL = [
       "Karena proses pemadatan ulang halaman indeks dan data melakukan operasi penulisan ulang fisik yang intensif sehingga berpotensi membebani I/O",
       "Karena perintah tersebut akan menghapus seluruh definisi Secondary Index dan Fulltext Index sehingga harus dibuat ulang secara manual",
       "Karena eksekusi perintah tersebut otomatis menurunkan ukuran innodb_buffer_pool_size ke nilai bawaan instalasi selama proses berlangsung",
-      "Karena proses reorganisasi fisik hanya dapat berjalan apabila seluruh koneksi aplikasi diputus dan server dijalankan pada mode pemulihan"
+      "Karena proses reorganisasi fisik hanya dapat berjalan apabila seluruh koneksi aplikasi diputus dan server dijalankan pada mode pemulihan darurat"
     ],
     "a": 0,
     "e": "Perintah OPTIMIZE TABLE atau ALTER TABLE ... ENGINE=InnoDB memadatkan kembali halaman yang terfragmentasi dan memulihkan efisiensi baca, namun melibatkan penulisan ulang fisik yang berat sehingga perlu dijadwalkan pada maintenance window."
@@ -585,7 +596,7 @@ const BANK_SOAL = [
     "q": "Bagaimana penafsiran yang tepat mengenai kondisi kesehatan memori apabila nilai Buffer Pool Hit-Ratio turun konsisten di bawah 95% disertai tingginya angka Innodb_buffer_pool_wait_free?",
     "o": [
       "Ukuran working set data aktif melampaui kapasitas innodb_buffer_pool_size sehingga terjadi pertukaran halaman RAM–Disk terus-menerus (memory thrashing)",
-      "Seluruh halaman data aktif telah berhasil dimuat seluruhnya ke dalam New Sublist sehingga permintaan pembacaan tidak lagi memerlukan ruang bebas",
+      "Seluruh halaman data aktif telah berhasil dimuat seluruhnya dari disk ke dalam New Sublist sehingga permintaan pembacaan tidak lagi memerlukan ruang bebas",
       "Kapasitas alokasi innodb_buffer_pool_size terlalu besar dibandingkan total RAM fisik sehingga sistem operasi menonaktifkan penulisan asinkron",
       "Mekanisme penyapuan halaman kotor oleh thread Page Cleaner berjalan terlalu cepat sehingga memicu lonjakan pembacaan indeks dari memori utama"
     ],
@@ -650,6 +661,11 @@ const CFG = {
   DURASI_MENIT: 30,           // durasi tetap 30 menit
   KKM: 70,                    // nilai >= KKM: selamat, < KKM: motivasi
   TAMPILKAN_PEMBAHASAN: true, // false = kunci/pembahasan disembunyikan (disarankan sampai semua kelas selesai)
+  FIREBASE_URL: 'https://dba-assessment-default-rtdb.asia-southeast1.firebasedatabase.app/',           // WAJIB: alamat Realtime Database, mis. 'https://nama-proyek-default-rtdb.asia-southeast1.firebasedatabase.app'
+  ROOT: 'dba_p9',             // nama folder data di database untuk pertemuan ini
+  WAJIB_SERVER: true,         // true = mahasiswa tidak bisa mulai bila server belum dikonfigurasi/terjangkau
+  HB_DETIK: 5,                // interval kirim status "sedang mengerjakan" ke dosen
+  POLL_DOSEN_DETIK: 4,        // interval pembaruan pantauan di Area Dosen
   DAFTAR_NIM: [],             // contoh: ['2301001','2301002']; kosong = semua NIM diterima
   HASH_DOSEN: 'd9facc103fb4e28ad641e715433fcfbe447efb6f90650cc314f3ec2613d7d160' // SHA-256 dari password dosen
 };
@@ -667,6 +683,103 @@ const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); retu
 const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
 const STORAGE_OK = (() => { try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); return true; } catch (e) { return false; } })();
 const normNim = s => String(s).trim().toUpperCase().replace(/\s+/g, '');
+
+/* ===================== SERVER REAL-TIME (FIREBASE REALTIME DATABASE, REST) ===================== */
+const DB_URL = String(CFG.FIREBASE_URL || '').trim().replace(/\/+$/, '');
+const CLOUD_ON = /^https:\/\/[^\s\/]+$/.test(DB_URL);
+const K_OUT = 'dba_assess.p9.v2.out', K_DEV = 'dba_assess.p9.dev';
+const nimKey = n => normNim(n).replace(/\./g, '~');   // titik tidak boleh menjadi kunci Firebase
+let DEV = lsGet(K_DEV, null);
+if (!DEV || typeof DEV !== 'string') { DEV = 'd' + Math.random().toString(36).slice(2) + Date.now().toString(36); lsSet(K_DEV, DEV); }
+let netOK = true;
+const netHtml = () => `<span id="net" class="net${netOK ? '' : ' off'}">${netOK ? '● Terhubung' : '○ Offline, dikirim ulang otomatis'}</span>`;
+function setNet(ok) {
+  netOK = ok;
+  const e = document.querySelector('#net');
+  if (e) { e.textContent = ok ? '● Terhubung' : '○ Offline, dikirim ulang otomatis'; e.className = 'net' + (ok ? '' : ' off'); }
+}
+async function api(metode, path, body, ms) {
+  if (!CLOUD_ON) return { ok: false, status: 0, data: null };
+  const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), ms || 9000) : null;
+  try {
+    const opt = { method: metode, cache: 'no-store' };
+    if (ctl) opt.signal = ctl.signal;
+    if (body !== undefined) opt.body = JSON.stringify(body);
+    const r = await fetch(DB_URL + '/' + CFG.ROOT + (path ? '/' + path : '') + '.json', opt);
+    let data = null; try { data = await r.json(); } catch (e) {}
+    setNet(true);
+    return { ok: r.ok, status: r.status, data };
+  } catch (e) {
+    setNet(false);
+    return { ok: false, status: 0, data: null };
+  } finally { if (timer) clearTimeout(timer); }
+}
+const galatServer = r => (r.status === 401 || r.status === 403)
+  ? 'Akses ke server ditolak (aturan database belum benar). Hubungi dosen.'
+  : 'Tidak dapat terhubung ke server.\nPeriksa koneksi internet lalu coba lagi.';
+
+/* status "sedang mengerjakan" → terlihat langsung di Area Dosen */
+function sesiData() {
+  return {
+    nim: S.nim, nama: S.nama, kelas: S.kelas, dev: DEV, status: 'ongoing',
+    mulai: S.start, endAt: S.endAt || 0, total: S.soal.length,
+    terjawab: S.ans.filter(a => a !== null).length, idx: S.idx, v: S.v,
+    log: S.log.slice(-10).map(l => ({ t: l.t, r: l.r })),
+    hb: Date.now(), hbS: { '.sv': 'timestamp' }
+  };
+}
+let pushing = false, pushLagi = false;
+async function pushSesi() {
+  if (!CLOUD_ON || !S || S.done) return;
+  if (pushing) { pushLagi = true; return; }
+  pushing = true;
+  try { await api('PATCH', 'sesi/' + nimKey(S.nim), sesiData()); } finally { pushing = false; }
+  if (pushLagi) { pushLagi = false; pushSesi(); }
+}
+
+/* hasil akhir: antrean lokal (outbox) dijamin terkirim, diulang otomatis sampai berhasil */
+const hasilServer = rec => ({
+  nama: rec.nama, nim: rec.nim, kelas: rec.kelas, benar: rec.benar, salah: rec.salah, kosong: rec.kosong,
+  total: rec.total, nilai: rec.nilai, violations: rec.violations, status: rec.status, mode: rec.mode,
+  ts: rec.ts, durasi: rec.durasi, log: (rec.log || []).map(l => ({ t: l.t, r: l.r })), dev: DEV
+});
+const detailServer = rec => rec.detail.map(d => ({ i: d.id, p: d.pilih, b: d.isCorrect ? 1 : 0 }));
+const outGet = () => { const o = lsGet(K_OUT, {}); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; };
+function outPut(rec) { const o = outGet(); o[nimKey(rec.nim)] = { h: hasilServer(rec), d: detailServer(rec) }; lsSet(K_OUT, o); }
+let flushing = false;
+async function flushOutbox() {
+  if (!CLOUD_ON || flushing) return;
+  const ks = Object.keys(outGet());
+  if (!ks.length) return;
+  flushing = true;
+  try {
+    for (const k of ks) {
+      const it = outGet()[k]; if (!it) continue;
+      const r1 = await api('PUT', 'hasil/' + k, it.h, 12000); if (!r1.ok) continue;
+      const r2 = await api('PUT', 'detail/' + k, it.d, 12000); if (!r2.ok) continue;
+      await api('DELETE', 'sesi/' + k);
+      const cur = outGet(); delete cur[k]; lsSet(K_OUT, cur);
+    }
+  } finally { flushing = false; }
+  updateSyncUI();
+}
+function syncHtml() {
+  if (!LAST) return '';
+  if (!CLOUD_ON) return '<div class="pesan info"><p>Server penyimpanan belum dikonfigurasi. Hasil hanya tersimpan di perangkat ini; tunjukkan layar ini kepada dosen.</p></div>';
+  return outGet()[nimKey(LAST.nim)]
+    ? '<div class="pesan semangat"><h3>⏳ Mengirim hasil ke dosen...</h3><p>Pastikan internet aktif dan jangan tutup halaman ini sampai muncul tanda terkirim. Pengiriman diulang otomatis.</p></div>'
+    : '<div class="pesan ok"><h3>✅ Hasil sudah terkirim ke dosen</h3></div>';
+}
+const outNoteHtml = () => Object.keys(outGet()).length
+  ? '<div class="pesan semangat" style="font-size:.9rem"><b>⏳ Ada hasil asesmen yang belum terkirim ke dosen.</b><br>Biarkan halaman ini terbuka dengan internet aktif; pengiriman diulang otomatis.</div>' : '';
+function updateSyncUI() {
+  const a = document.querySelector('#sync'), b = document.querySelector('#outnote');
+  if (a) a.innerHTML = syncHtml();
+  if (b) b.innerHTML = outNoteHtml();
+}
+window.addEventListener('online', () => { flushOutbox(); pushSesi(); });
+flushOutbox();
 
 function hasilSemua() {
   const r = lsGet(K_RES, []);
@@ -720,15 +833,17 @@ function render(keep) {
   $('#app').innerHTML = ({ home, quiz, summary, dosen })[V]();
   if (!keep) window.scrollTo(0, 0);
   tick();
+  if (V === 'dosen') gambarDosenLive();
 }
 function hudHome() {
   return `<div class="in"><b class="lg"><span class="mk">DBA</span>ASESMEN DATABASE ADMINISTRATION</b></div>`;
 }
 function hudQuiz() {
   return `<div class="in">
-    <b class="lg"><span class="mk">DBA</span>OPTIMASI PERFORMA SISTEM</b>
+    <b class="lg"><span class="mk">DBA</span>P9: OPTIMASI PERFORMA SISTEM</b>
     <span class="pl">
       <span id="tmr"></span>
+      ${netHtml()}
       <span>Pelanggaran: ${S.v}/${CFG.MAKS_PELANGGARAN}</span>
       <span class="av">${esc(S.nama.charAt(0).toUpperCase())}</span>
       <span>${esc(S.nama)} (${esc(S.nim)} - ${esc(S.kelas)})</span>
@@ -739,18 +854,23 @@ function hudQuiz() {
 /* ===================== HALAMAN AWAL ===================== */
 function home() {
   const n = Math.min(CFG.JUMLAH_SOAL, BANK_SOAL.length);
-  const galat = !BANK_OK ? 'Bank soal tidak valid. Hubungi dosen.' : (!STORAGE_OK ? 'Penyimpanan browser diblokir (mode privat?). Nonaktifkan lalu muat ulang halaman.' : '');
+  const galat = !BANK_OK ? 'Bank soal tidak valid. Hubungi dosen.' : (!STORAGE_OK ? 'Penyimpanan browser diblokir (mode privat?). Nonaktifkan lalu muat ulang halaman.' : ((CFG.WAJIB_SERVER && !CLOUD_ON) ? 'Server penyimpanan hasil belum dikonfigurasi. Hubungi dosen.' : ''));
   return `<div class="login">
     <section class="card">
-      <h1 style="margin-bottom:2px;"><span class="hl">OPTIMASI PERFORMA SISTEM </span></h1>
+      <h1><span class="hl">ASESMEN</span> DBA</h1>
+      <p class="sub" style="margin-bottom:2px;">Mata Kuliah : Database Administration</p>
+      <p class="sub">Pertemuan 9 : OPTIMASI PERFORMA SISTEM</p>
       <div class="pesan info" style="font-size:.92rem">
         <b>Aturan Asesmen</b><br>
         • ${n} soal dikerjakan dalam waktu ${CFG.DURASI_MENIT} menit.<br>
-        • Pindah atau keluar dari layar dicatat sebagai pelanggaran.<br>
+        • Tetap berada pada halaman ujian dan mode layar penuh. Jika layar penuh terlepas, ujian dikunci dan soal disembunyikan; klik di mana saja (atau tekan tombol apa pun) pada peringatan untuk kembali ke layar penuh secara otomatis. Pindah tab/aplikasi dan keluar layar penuh dicatat sebagai pelanggaran.<br>
         • Pelanggaran ke-${CFG.MAKS_PELANGGARAN} akan menghentikan asesmen secara otomatis.<br>
         • Mahasiswa mendapatkan 1 (satu) kesempatan melakukan asesmen.<br>
+        • Penjelasan jawaban benar ditampilkan setelah jawaban dikumpulkan.<br>
+        • Jawaban dikirim otomatis ke dosen. Pastikan internet aktif selama asesmen dan hingga muncul tanda &ldquo;terkirim&rdquo;.
       </div>
       ${galat ? `<p class="dlg-err">${esc(galat)}</p>` : ''}
+      <div id="outnote">${outNoteHtml()}</div>
       <div>
         <label for="nama">Nama Lengkap</label>
         <input id="nama" maxlength="50" placeholder="Masukkan Nama Lengkap Anda..." autocomplete="off">
@@ -759,23 +879,26 @@ function home() {
         <label for="kelas">Pilihan Kelas</label>
         <select id="kelas">
           <option value="">-- Pilih Kelas --</option>
-          <option value="TIFA3">TIFA3</option>
-          <option value="TIFB3">TIFB3</option>
+          <option value="TIF3A">TIF3A</option>
+          <option value="TIF3B">TIF3B</option>
         </select>
-        <button class="btn" style="width:100%; min-height:50px; margin-top:10px;" onclick="mulaiUjian()" ${galat ? 'disabled' : ''}>Mulai Asesmen</button>
+        <button class="btn" id="btn-mulai" style="width:100%; min-height:50px; margin-top:10px;" onclick="mulaiUjian()" ${galat ? 'disabled' : ''}>Mulai Asesmen</button>
       </div>
     </section>
     <section class="card" style="text-align:center;">
       <h3>Portal Dosen Pengampu</h3>
-      <p style="color:var(--slate-500); font-size:.9rem; margin-bottom:12px;">Unduh rekapitulasi nilai CSV/Excel atau kelola data mahasiswa.</p>
+      <p style="color:var(--slate-500); font-size:.9rem; margin-bottom:12px;">Pantau pengerjaan mahasiswa secara langsung, unduh rekap nilai CSV/Excel, atau kelola data.</p>
       <button class="btn alt" onclick="bukaAreaDosen()">Akses Area Dosen</button>
     </section>
   </div>`;
 }
 function blokir(pesan) { dlg({ judul: 'Tidak Dapat Memulai Asesmen', pesan, info: true }); }
 
-function mulaiUjian() {
+let memulai = false;
+async function mulaiUjian() {
+  if (memulai) return;
   if (!STORAGE_OK || !BANK_OK) return toast('Sistem belum siap. Hubungi dosen.');
+  if (CFG.WAJIB_SERVER && !CLOUD_ON) return toast('Server penyimpanan belum dikonfigurasi. Hubungi dosen.');
   const el = { nama: $('#nama'), nim: $('#nim'), kelas: $('#kelas') };
   Object.values(el).forEach(e => e.classList.remove('input-error'));
   const nama = el.nama.value.trim().replace(/\s+/g, ' ');
@@ -783,12 +906,43 @@ function mulaiUjian() {
   if (!nama) { el.nama.classList.add('input-error'); return toast('PERINGATAN: Nama Lengkap wajib diisi!'); }
   if (!nim) { el.nim.classList.add('input-error'); return toast('PERINGATAN: NIM wajib diisi!'); }
   if (!/^[A-Z0-9._-]{4,20}$/.test(nim)) { el.nim.classList.add('input-error'); return toast('NIM tidak valid (4–20 karakter huruf/angka).'); }
-  if (!kelas) { el.kelas.classList.add('input-error'); return toast('PERINGATAN: Silakan pilih Kelas TIFA3 atau TIFB3!'); }
+  if (!kelas) { el.kelas.classList.add('input-error'); return toast('PERINGATAN: Silakan pilih Kelas TIF3A atau TIF3B!'); }
   if (CFG.DAFTAR_NIM.length && !CFG.DAFTAR_NIM.map(normNim).includes(nim)) return blokir('NIM tidak terdaftar sebagai peserta asesmen ini.');
 
-  const ses = lsGet(K_SES + nim, null);
-  if (hasilSemua().some(r => normNim(r.nim) === nim) || (ses && ses.status === 'final'))
+  memulai = true;
+  const tb = $('#btn-mulai'); if (tb) { tb.disabled = true; tb.textContent = 'Memeriksa server...'; }
+  try { await mulaiUjian2(nama, nim, kelas); }
+  finally {
+    memulai = false;
+    const b = $('#btn-mulai');
+    if (b && V === 'home') { b.disabled = false; b.textContent = 'Mulai Asesmen'; }
+  }
+}
+async function mulaiUjian2(nama, nim, kelas) {
+  const k = nimKey(nim);
+  let ses = lsGet(K_SES + nim, null);
+  const lokalFinal = () => hasilSemua().some(r => normNim(r.nim) === nim) || (ses && ses.status === 'final');
+
+  if (CLOUD_ON) {
+    const [rh, rs] = await Promise.all([api('GET', 'hasil/' + k), api('GET', 'sesi/' + k)]);
+    if (rh.ok && rs.ok) {
+      if (rh.data) return blokir('Asesmen untuk NIM ini sudah tercatat dan tidak dapat diulang.\nJika ada kendala teknis, hubungi dosen pengampu.');
+      if (lokalFinal()) {
+        if (outGet()[k]) { flushOutbox(); return blokir('Hasil asesmen sebelumnya masih dalam proses dikirim ke dosen.\nPastikan internet aktif, tunggu beberapa detik, lalu coba lagi.'); }
+        // dosen sudah membuka kunci di server → bersihkan catatan lokal
+        lsSet(K_RES, hasilSemua().filter(r => normNim(r.nim) !== nim)); lsDel(K_SES + nim); ses = null;
+      }
+      if (ses && ses.status === 'ongoing' && !rs.data) { lsDel(K_SES + nim); ses = null; } // dosen membuka kunci
+      if (rs.data && !(ses && ses.status === 'ongoing' && rs.data.dev === DEV))
+        return blokir('Asesmen untuk NIM ini sudah dimulai di perangkat lain.\nJika perangkat sebelumnya bermasalah, hubungi dosen untuk membuka kunci.');
+    } else {
+      const melanjutkan = ses && ses.status === 'ongoing';
+      if (CFG.WAJIB_SERVER && !melanjutkan) return blokir(galatServer(rh.ok ? rs : rh));
+      if (lokalFinal()) return blokir('Asesmen untuk NIM ini sudah tercatat dan tidak dapat diulang.\nJika ada kendala teknis, hubungi dosen pengampu.');
+    }
+  } else if (lokalFinal()) {
     return blokir('Asesmen untuk NIM ini sudah tercatat dan tidak dapat diulang.\nJika ada kendala teknis, hubungi dosen pengampu.');
+  }
 
   if (ses && ses.status === 'ongoing') { // lanjutkan sesi yang terputus
     if (ses.tab !== TAB && Date.now() - ses.hb < 6000)
@@ -797,6 +951,7 @@ function mulaiUjian() {
     if (S.endAt && Date.now() >= S.endAt) { selesaikan('waktu'); return; }
     S.v++; S.log.push({ t: Date.now(), r: 'Keluar atau memuat ulang halaman ujian' });
     if (!saveSes()) return toast('Gagal menyimpan sesi. Hubungi dosen.');
+    pushSesi();
     if (S.v >= CFG.MAKS_PELANGGARAN) { selesaikan('dihentikan'); return; }
     mulaiSesi(); S.locked = true; tampilPeringatan(S.log[S.log.length - 1].r);
     return;
@@ -812,6 +967,15 @@ function mulaiUjian() {
   S = { nama, nim, kelas, soal, ans: new Array(n).fill(null), idx: 0, v: 0, log: [], start: now,
         endAt: CFG.DURASI_MENIT ? now + CFG.DURASI_MENIT * 60000 : 0, status: 'ongoing', tab: TAB, hb: now,
         locked: false, done: false, lastV: 0, fsOk: false, noFS: false };
+
+  if (CLOUD_ON) { // klaim NIM di server agar tidak bisa dibuka ganda dari perangkat lain
+    const c = await api('PUT', 'sesi/' + k, sesiData());
+    if (!c.ok) { const g = galatServer(c); if (CFG.WAJIB_SERVER) { S = null; return blokir(g); } }
+    else {
+      const chk = await api('GET', 'sesi/' + k + '/dev');
+      if (chk.ok && chk.data && chk.data !== DEV) { S = null; return blokir('Asesmen untuk NIM ini sedang dimulai di perangkat lain.\nHubungi dosen jika ini kesalahan.'); }
+    }
+  }
   if (!saveSes()) { S = null; return toast('Gagal menyimpan sesi ujian. Ujian tidak dapat dimulai.'); }
   mulaiSesi();
 }
@@ -829,17 +993,6 @@ function mulaiSesi() {
       tampilGerbangFullscreen();
     }
   });
-}
-function tampilGerbangFullscreen() {
-  const d = $('#dlg');
-  d.hidden = false;
-  d.innerHTML = `<div class="dlg-box warn" role="alertdialog" aria-modal="true">
-    <h3>Mode Layar Penuh Diperlukan</h3>
-    <p>Browser belum mengaktifkan mode layar penuh. Ujian dikunci sampai mode layar penuh berhasil diaktifkan.</p>
-    <p id="w-status" class="dlg-err" aria-live="polite">Klik tombol di bawah untuk mengaktifkan fullscreen.</p>
-    <button class="btn" id="w-ok" style="width:100%">Aktifkan Fullscreen</button></div>`;
-  $('#w-ok').onclick = pulihkanFullscreen;
-  $('#w-ok').focus();
 }
 function saveSes() {
   if (!S) return false;
@@ -899,7 +1052,7 @@ function pelanggaran(alasan) {
   if (V !== 'quiz' || !S || S.done || S.locked) return;
   const now = Date.now();
   if (now - S.lastV < 1200) return;      // satu kejadian fisik = satu pelanggaran (blur+visibility+fullscreen)
-  S.lastV = now; S.v++; S.log.push({ t: now, r: alasan }); saveSes();
+  S.lastV = now; S.v++; S.log.push({ t: now, r: alasan }); saveSes(); pushSesi();
   if (S.v >= CFG.MAKS_PELANGGARAN) { selesaikan('dihentikan'); return; }
   S.locked = true; render(true); tampilPeringatan(alasan);
 }
@@ -978,8 +1131,15 @@ function tick() {
     if (sisa < 300000 && !S.w5) { S.w5 = true; toast('Sisa waktu kurang dari 5 menit.'); }
   }
 }
+let hbN = 0;
 setInterval(() => {
-  if (V === 'quiz' && S && !S.done) { tick(); if (++ticks % 3 === 0 && S && !S.done) { S.hb = Date.now(); saveSes(); } }
+  hbN++;
+  if (V === 'quiz' && S && !S.done) {
+    tick();
+    if (S && !S.done && hbN % 3 === 0) { S.hb = Date.now(); saveSes(); }
+    if (S && !S.done && hbN % Math.max(2, CFG.HB_DETIK || 5) === 0) pushSesi();
+  }
+  if (hbN % 5 === 0) flushOutbox();
 }, 1000);
 
 /* ===================== HALAMAN UJIAN ===================== */
@@ -1000,7 +1160,7 @@ function quiz() {
     </div>
   </section>`;
 }
-function pilihJawaban(k) { if (!S || S.done || S.locked) return; S.ans[S.idx] = k; saveSes(); render(true); }
+function pilihJawaban(k) { if (!S || S.done || S.locked) return; S.ans[S.idx] = k; saveSes(); pushSesi(); render(true); }
 function gotoSoal(i) { if (!S || S.done || S.locked) return; S.idx = i; saveSes(); render(); }
 function prevSoal() { if (S.idx > 0) gotoSoal(S.idx - 1); }
 function nextSoal() { if (S.idx < S.soal.length - 1) gotoSoal(S.idx + 1); }
@@ -1022,7 +1182,7 @@ function buatHasil(s, mode) {
     id: 'res_' + Date.now().toString(36), nama: s.nama, nim: s.nim, kelas: s.kelas,
     benar, salah: total - benar - kosong, kosong, total, nilai: Math.round(benar / total * 100),
     violations: s.v, log: s.log, status, mode, ts: Date.now(), durasi: Math.round((Date.now() - s.start) / 1000),
-    detail: s.soal.map((q, i) => ({ tp: q.tp, q: q.q, userAns: s.ans[i], correctAns: q.a, options: q.o, explain: q.e, isCorrect: s.ans[i] === q.a }))
+    detail: s.soal.map((q, i) => ({ id: q.id, pilih: s.ans[i] === null ? -1 : BANK_SOAL[q.id].o.indexOf(q.o[s.ans[i]]), tp: q.tp, q: q.q, userAns: s.ans[i], correctAns: q.a, options: q.o, explain: q.e, isCorrect: s.ans[i] === q.a }))
   };
 }
 function simpanHasil(rec) {
@@ -1037,6 +1197,7 @@ function selesaikan(mode) {
   S.done = true; S.locked = true;
   const rec = buatHasil(S, mode);
   rec.saveFail = !simpanHasil(rec);
+  if (CLOUD_ON) { outPut(rec); flushOutbox(); }
   lepasGuard(); lepasPemulih();
   document.body.classList.remove('terkunci');
   try { if (fsEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } } catch (e) {}
@@ -1047,8 +1208,8 @@ function selesaikan(mode) {
 /* ===================== HALAMAN AKHIR ===================== */
 function pesanAkhir(r) {
   return r.nilai >= CFG.KKM
-    ? { cls: 'ok', judul: 'Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. ` }
-    : { cls: 'semangat', judul: 'Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging!` };
+    ? { cls: 'ok', judul: '🎉 Selamat! Anda Lulus Asesmen Ini', teks: `Nilai ${r.nilai} menunjukkan pemahaman yang baik tentang optimasi performa sistem. Pertahankan semangat belajar Anda: biasakan memantau Buffer Pool, Slow Query Log, dan pemakaian indeks pada sistem nyata. Anda sedang menuju administrator basis data yang andal!` }
+    : { cls: 'semangat', judul: '💪 Tetap Semangat, Anda Pasti Bisa!', teks: `Nilai ${r.nilai} belum mencapai batas ${CFG.KKM}, tetapi ini bukan akhir. Setiap jawaban yang keliru adalah petunjuk bagian mana yang perlu diperkuat. Pelajari kembali B-Tree, indeks InnoDB, Buffer Pool, Slow Query Log, dan Write-Ahead Logging, diskusikan dengan teman atau dosen, lalu teruslah berlatih. Proses belajar yang gigih akan membuahkan hasil yang lebih baik!` };
 }
 function summary() {
   const r = LAST, lulus = r.nilai >= CFG.KKM, m = pesanAkhir(r), stop = r.mode === 'dihentikan';
@@ -1061,6 +1222,7 @@ function summary() {
         <span class="chip ${lulus ? 'ok' : 'bad'}" style="font-size:.9rem; padding:6px 18px;">${lulus ? 'LULUS EVALUASI' : 'PERLU REMEDIAL'}</span>
       </div>
       <div class="pesan ${m.cls}"><h3>${m.judul}</h3><p>${m.teks}</p></div>
+      <div id="sync">${syncHtml()}</div>
       ${stop ? `<div class="pesan info"><h3>⛔ Ujian Dihentikan Otomatis</h3><p>Terdeteksi ${r.violations} pelanggaran. Jawaban yang sudah terisi dinilai, keterangan pelanggaran diteruskan kepada dosen, dan asesmen tidak dapat diulang.</p></div>` : ''}
       ${r.mode === 'waktu' ? `<div class="pesan info"><p>Waktu pengerjaan habis; jawaban terakhir Anda dikumpulkan otomatis.</p></div>` : ''}
       ${r.saveFail ? `<div class="pesan info"><p><b>Hasil gagal tersimpan di perangkat ini.</b> Tangkap layar halaman ini dan tunjukkan kepada dosen.</p></div>` : ''}
@@ -1079,14 +1241,15 @@ function summary() {
           <p style="margin:4px 0; font-size:.92rem; color:var(--g-txt); font-weight:700;">Jawaban Benar: (${'ABCD'[it.correctAns]}) ${esc(it.options[it.correctAns])}</p>
           <div style="background:var(--slate-100); padding:10px 14px; border-radius:8px; margin-top:8px; font-size:.88rem; color:var(--slate-700);">💡 <b>Penjelasan:</b> ${esc(it.explain)}</div>
         </div>`).join('')}</div>` : ''}
-      <button class="btn" style="width:100%; margin-top:20px;" onclick="keHome()">Selesai & Keluar ke Tampilan Awal</button>
+      <button class="btn" style="width:100%; margin-top:20px;" onclick="keHome()">Selesaikan & Keluar ke Tampilan Awal</button>
     </section>
   </div>`;
 }
-function keHome() { LAST = null; S = null; V = 'home'; render(); }
+function keHome() { stopPollDosen(); LAST = null; S = null; V = 'home'; render(); }
 
-/* ===================== AREA DOSEN ===================== */
+/* ===================== AREA DOSEN (PANTAUAN LIVE) ===================== */
 let gagalPin = 0, kunciSampai = 0;
+let DD = { sesi: {}, hasil: {}, ts: 0, err: '', ok: false }, dPoll = null, dBusy = false, dFilter = { kelas: '', q: '' };
 function bukaAreaDosen() {
   dlg({
     judul: 'Akses Password Area Dosen', pesan: 'Masukkan password Dosen Pengampu untuk mengakses rekapitulasi data:',
@@ -1099,88 +1262,145 @@ function bukaAreaDosen() {
       if (++gagalPin >= 5) { kunciSampai = Date.now() + 60000; gagalPin = 0; }
       return 'Password Dosen salah!';
     },
-    aksi: () => {
-      sesiAktif().forEach(s => { // sesi terputus yang waktunya sudah habis dinilai otomatis
-        if (s.endAt && Date.now() > s.endAt && Date.now() - s.hb > 10000) simpanHasil(buatHasil(s, 'waktu'));
-      });
-      V = 'dosen'; render();
-    }
+    aksi: () => { V = 'dosen'; render(); mulaiPollDosen(); }
   });
 }
-const ketCurang = x => x.violations > 0 ? `Terdeteksi (${x.violations}x Pelanggaran)${x.mode === 'dihentikan' ? ' - dihentikan otomatis' : ''}` : 'Tidak Ada';
+function mulaiPollDosen() { stopPollDosen(); muatDosen(); dPoll = setInterval(muatDosen, Math.max(2, CFG.POLL_DOSEN_DETIK || 4) * 1000); }
+function stopPollDosen() { if (dPoll) clearInterval(dPoll); dPoll = null; }
+async function muatDosen() {
+  if (V !== 'dosen' || dBusy) return;
+  dBusy = true;
+  try {
+    const [a, b] = await Promise.all([api('GET', 'sesi'), api('GET', 'hasil')]);
+    if (a.ok && b.ok) { DD.sesi = a.data || {}; DD.hasil = b.data || {}; DD.ts = Date.now(); DD.err = ''; DD.ok = true; }
+    else { DD.ok = false; DD.err = !CLOUD_ON ? 'FIREBASE_URL belum diisi pada CFG.' : (galatServer(b.ok ? a : b).split('\n')[0] + ' Menampilkan data terakhir.'); }
+  } finally { dBusy = false; }
+  if (V === 'dosen') gambarDosenLive();
+}
+const arr = v => Array.isArray(v) ? v.filter(Boolean) : (v && typeof v === 'object' ? Object.values(v) : []);
+const jam = ts => ts ? new Date(ts).toLocaleTimeString('id-ID') : '-';
+const mmss = ms => { ms = Math.max(0, Math.round(ms / 1000)); return String(Math.floor(ms / 60)).padStart(2, '0') + ':' + String(ms % 60).padStart(2, '0'); };
+function barisDosen() {
+  const H = DD.hasil || {}, Sx = DD.sesi || {}, rows = [];
+  Object.keys(H).forEach(k => { const x = H[k]; if (x && typeof x === 'object') rows.push({ ...x, tipe: 'selesai', key: k }); });
+  Object.keys(Sx).forEach(k => { if (H[k]) return; const x = Sx[k]; if (x && typeof x === 'object' && x.nim) rows.push({ ...x, tipe: 'aktif', key: k }); });
+  return rows;
+}
+const ketCurang = x => (x.violations || 0) > 0 ? `Terdeteksi (${x.violations}x Pelanggaran)${x.mode === 'dihentikan' ? ' - dihentikan otomatis' : ''}` : 'Tidak Ada';
 function dosen() {
-  const rs = hasilSemua().slice().sort((a, b) => (a.kelas + a.nama).localeCompare(b.kelas + b.nama));
-  const aktif = sesiAktif();
-  const avg = rs.length ? Math.round(rs.reduce((a, x) => a + x.nilai, 0) / rs.length * 10) / 10 : 0;
-  const lulus = rs.filter(x => x.nilai >= CFG.KKM).length, stop = rs.filter(x => x.mode === 'dihentikan').length;
-  const th = 'padding:10px;';
-  const aksi = nim => `<button class="btn alt" style="min-height:34px; padding:4px 12px; margin:0;" data-nim="${esc(nim)}" onclick="bukaKunci(this.dataset.nim)">Buka Kunci</button>`;
-  return `<div class="login" style="max-width:900px;">
+  const opt = ['', 'TIF3A', 'TIF3B'].map(v => `<option value="${v}" ${dFilter.kelas === v ? 'selected' : ''}>${v || 'Semua Kelas'}</option>`).join('');
+  return `<div class="login" style="max-width:1040px;">
     <section class="card">
       <h2>Portal Administrasi Dosen</h2>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="val">${rs.length}</div><div class="lbl">Selesai</div></div>
-        <div class="stat-box"><div class="val">${aktif.length}</div><div class="lbl">Belum Selesai</div></div>
-        <div class="stat-box"><div class="val">${avg}</div><div class="lbl">Rata-rata</div></div>
-        <div class="stat-box"><div class="val">${lulus}/${rs.length}</div><div class="lbl">Nilai ≥ ${CFG.KKM}</div></div>
-        <div class="stat-box"><div class="val" style="color:var(--r);">${stop}</div><div class="lbl">Dihentikan</div></div>
-      </div>
+      <p id="d-status" style="color:var(--slate-600); margin-bottom:12px;"></p>
+      <div id="d-stats" class="stat-grid"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn" onclick="expCSV()">📥 Unduh Rekap Excel/CSV</button>
         <button class="btn alt" onclick="expJSON()">📄 Unduh Data JSON</button>
         <button class="btn danger" onclick="resetSistem()">⚠️ Reset Data Sistem</button>
       </div>
-      <h3 style="margin-top:24px;">Daftar Nilai Mahasiswa Ujian</h3>
-      ${rs.length + aktif.length === 0 ? '<p style="color:var(--slate-500);">Belum ada data ujian mahasiswa.</p>' : `
-      <div style="overflow-x:auto; margin-top:10px;">
-        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:.9rem;">
-          <thead><tr style="background:var(--slate-100); border-bottom:2px solid var(--slate-200);">
-            <th style="${th}">Nama</th><th style="${th}">NIM</th><th style="${th}">Kelas</th><th style="${th}">Nilai</th><th style="${th}">Status</th><th style="${th}">Keterangan Kecurangan</th><th style="${th}">Aksi</th>
-          </tr></thead>
-          <tbody>
-            ${rs.map(x => `<tr style="border-bottom:1px solid var(--slate-200);">
-              <td style="${th} font-weight:700;">${esc(x.nama)}</td><td style="${th}">${esc(x.nim)}</td><td style="${th}">${esc(x.kelas)}</td>
-              <td style="${th} font-weight:800; color:var(--brand);">${x.nilai}</td><td style="${th}">${esc(x.status || 'Selesai')}</td>
-              <td style="${th} font-weight:600; color:${x.violations > 0 ? 'var(--r)' : 'var(--g-txt)'};" title="${esc((x.log || []).map(l => l.r).join('; '))}">${esc(ketCurang(x))}</td>
-              <td style="${th}">${aksi(x.nim)}</td></tr>`).join('')}
-            ${aktif.map(x => `<tr style="border-bottom:1px solid var(--slate-200); background:var(--y-bg);">
-              <td style="${th} font-weight:700;">${esc(x.nama)}</td><td style="${th}">${esc(x.nim)}</td><td style="${th}">${esc(x.kelas)}</td>
-              <td style="${th}">-</td><td style="${th}">Belum selesai / terputus</td><td style="${th}">${x.v}x Pelanggaran</td><td style="${th}">${aksi(x.nim)}</td></tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`}
+      <h3 style="margin-top:24px;">Pantauan Mahasiswa (Real-Time)</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+        <select id="d-kelas" style="max-width:200px; margin:0;" onchange="dFilter.kelas=this.value; gambarDosenLive()">${opt}</select>
+        <input id="d-q" style="max-width:320px; margin:0;" placeholder="Cari nama / NIM..." value="${esc(dFilter.q)}" oninput="dFilter.q=this.value; gambarDosenLive()">
+      </div>
+      <div id="d-table" style="overflow-x:auto; margin-top:12px;"></div>
       <button class="btn alt" style="width:100%; margin-top:24px;" onclick="keHome()">Keluar Dari Area Dosen</button>
     </section>
   </div>`;
 }
-function bukaKunci(nim) {
-  dlg({ judul: 'Buka Kunci Peserta', pesan: `Hapus data NIM ${nim} agar dapat mengikuti asesmen sekali lagi? Nilai lama akan terhapus.`,
-        tombol: 'Buka Kunci', bahaya: true,
-        aksi: () => { const n = normNim(nim); lsSet(K_RES, hasilSemua().filter(r => normNim(r.nim) !== n)); lsDel(K_SES + n); render(true); toast('Kunci dibuka untuk NIM ' + nim); } });
+function gambarDosenLive() {
+  const st = $('#d-status'), sEl = $('#d-stats'), tEl = $('#d-table');
+  if (!st || !sEl || !tEl) return;
+  const now = Date.now();
+  let rows = barisDosen();
+  rows.forEach(x => {
+    if (x.tipe !== 'aktif') return;
+    const ref = x.hbS || x.hb || now;
+    x.lag = now - ref;
+    x.sisa = (x.endAt && x.hb) ? (x.endAt - x.hb) - (now - ref) : null;
+    x.putus = x.lag > 20000;
+  });
+  const sel = rows.filter(x => x.tipe === 'selesai'), akt = rows.filter(x => x.tipe === 'aktif');
+  const avg = sel.length ? Math.round(sel.reduce((a, x) => a + (x.nilai || 0), 0) / sel.length * 10) / 10 : 0;
+  const lulus = sel.filter(x => x.nilai >= CFG.KKM).length, stop = sel.filter(x => x.mode === 'dihentikan').length;
+  const putus = akt.filter(x => x.putus).length;
+  st.innerHTML = (DD.ok ? '<span class="chip ok">● LIVE</span> ' : '<span class="chip bad">● TERPUTUS</span> ') +
+    `Pembaruan terakhir: <b>${jam(DD.ts)}</b> (otomatis tiap ${CFG.POLL_DOSEN_DETIK} detik).` +
+    (DD.err ? ` <span style="color:var(--r-txt); font-weight:700;">${esc(DD.err)}</span>` : '');
+  sEl.innerHTML = [
+    [rows.length, 'Peserta', ''], [akt.length - putus, 'Mengerjakan', 'var(--brand)'], [putus, 'Terputus', 'var(--y)'],
+    [sel.length, 'Selesai', 'var(--g)'], [avg, 'Rata-rata', ''], [`${lulus}/${sel.length}`, `Nilai ≥ ${CFG.KKM}`, ''], [stop, 'Dihentikan', 'var(--r)']
+  ].map(([v, l, c]) => `<div class="stat-box"><div class="val" ${c ? `style="color:${c};"` : ''}>${v}</div><div class="lbl">${l}</div></div>`).join('');
+
+  const q = dFilter.q.trim().toLowerCase();
+  rows = rows.filter(x => (!dFilter.kelas || x.kelas === dFilter.kelas) && (!q || String(x.nama).toLowerCase().includes(q) || String(x.nim).toLowerCase().includes(q)));
+  rows.sort((a, b) => (a.tipe === b.tipe ? 0 : (a.tipe === 'aktif' ? -1 : 1)) || (a.kelas + a.nama).localeCompare(b.kelas + b.nama));
+  if (!rows.length) { tEl.innerHTML = '<p style="color:var(--slate-500);">Belum ada data mahasiswa yang cocok. Data muncul otomatis begitu mahasiswa mulai mengerjakan.</p>'; return; }
+  const aksi = (x, detail) => `${detail ? `<button class="btn alt mini" data-nim="${esc(x.nim)}" onclick="lihatDetail(this.dataset.nim)">Detail</button>` : ''}<button class="btn alt mini" data-nim="${esc(x.nim)}" onclick="bukaKunci(this.dataset.nim)">Buka Kunci</button>`;
+  const vTitle = x => esc(arr(x.log).map(l => l.r).join('; '));
+  tEl.innerHTML = `<table class="dtbl"><thead><tr><th>Nama</th><th>NIM</th><th>Kelas</th><th>Status</th><th>Progres / Nilai</th><th>Sisa Waktu</th><th>Pelanggaran</th><th>Aksi</th></tr></thead><tbody>` +
+    rows.map(x => {
+      const v = x.tipe === 'selesai' ? (x.violations || 0) : (x.v || 0);
+      const vCell = `<td style="font-weight:700; color:${v > 0 ? 'var(--r)' : 'var(--g-txt)'};" title="${vTitle(x)}">${v > 0 ? v + 'x' : '-'}</td>`;
+      if (x.tipe === 'selesai')
+        return `<tr><td style="font-weight:700;">${esc(x.nama)}</td><td>${esc(x.nim)}</td><td>${esc(x.kelas)}</td>
+          <td><span class="chip ${x.mode === 'dihentikan' ? 'bad' : 'ok'}">${esc(x.status || 'Selesai')}</span></td>
+          <td style="font-weight:800; color:var(--brand);">${x.nilai} <span style="font-weight:600; color:var(--slate-500);">(${x.benar}/${x.total})</span></td><td>-</td>${vCell}<td>${aksi(x, true)}</td></tr>`;
+      const habis = x.sisa !== null && x.sisa <= 0;
+      return `<tr class="aktif ${x.putus ? 'putus' : ''}"><td style="font-weight:700;">${esc(x.nama)}</td><td>${esc(x.nim)}</td><td>${esc(x.kelas)}</td>
+        <td>${x.putus ? `<span class="chip warn">Terputus ${mmss(x.lag)}</span>` : '<span class="chip info">Mengerjakan</span>'}</td>
+        <td>${x.terjawab || 0}/${x.total || '?'} terjawab • soal ${(x.idx || 0) + 1}</td>
+        <td>${x.sisa === null ? '-' : (habis ? 'Habis' : mmss(x.sisa))}</td>${vCell}<td>${aksi(x, false)}</td></tr>`;
+    }).join('') + '</tbody></table>';
 }
-const csvCell = c => { let s = String(c); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+async function lihatDetail(nim) {
+  const k = nimKey(nim), r = await api('GET', 'detail/' + k);
+  if (!r.ok || !r.data) return toast('Detail jawaban tidak tersedia.');
+  const h = (DD.hasil || {})[k] || {};
+  const baris = arr(r.data).map((d, n) => `${n + 1}. ${d.b ? '✓ Benar' : (d.p < 0 ? '✗ Kosong' : '✗ Salah')} — ${(BANK_SOAL[d.i] && TOPIK[BANK_SOAL[d.i].t]) || ''}`);
+  dlg({ judul: `${h.nama || nim} • Nilai ${h.nilai === undefined ? '-' : h.nilai}`, pesan: 'Urutan sesuai tampilan soal pada layar mahasiswa:\n' + baris.join('\n'), info: true });
+}
+function bukaKunci(nim) {
+  dlg({ judul: 'Buka Kunci Peserta', pesan: `Hapus data NIM ${nim} (nilai dan sesi, di server) agar dapat mengikuti asesmen sekali lagi? Nilai lama akan terhapus.`,
+        tombol: 'Buka Kunci', bahaya: true,
+        aksi: async () => {
+          const k = nimKey(nim), n = normNim(nim);
+          const rs = await Promise.all(['sesi/', 'hasil/', 'detail/'].map(p => api('DELETE', p + k)));
+          if (!rs.every(r => r.ok)) return toast('Gagal menghapus di server. Periksa koneksi.');
+          lsSet(K_RES, hasilSemua().filter(r => normNim(r.nim) !== n)); lsDel(K_SES + n);
+          const o = outGet(); delete o[k]; lsSet(K_OUT, o);
+          toast('Kunci dibuka untuk NIM ' + nim); muatDosen();
+        } });
+}
+const csvCell = c => { let s = String(c === undefined || c === null ? '' : c); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
 function expCSV() {
-  const rs = hasilSemua(), aktif = sesiAktif();
-  if (!rs.length && !aktif.length) return toast('Belum ada data nilai mahasiswa untuk diunduh.');
-  const rows = [['Nama', 'NIM', 'Kelas', 'Nilai Akhir', 'Status', 'Keterangan Kecurangan']];
-  rs.forEach(x => rows.push([x.nama, x.nim, x.kelas, x.nilai, x.status || 'Selesai', ketCurang(x)]));
-  aktif.forEach(x => rows.push([x.nama, x.nim, x.kelas, '', 'Belum selesai / terputus', `${x.v}x Pelanggaran`]));
-  dlFile('Rekap_Nilai_DBA_Pertemuan9.csv', '\ufeff' + rows.map(r => r.map(csvCell).join(',')).join('\r\n'), 'text/csv');
+  const rs = barisDosen().sort((a, b) => (a.kelas + a.nama).localeCompare(b.kelas + b.nama));
+  if (!rs.length) return toast('Belum ada data nilai mahasiswa untuk diunduh.');
+  const rows = [['Nama', 'NIM', 'Kelas', 'Nilai Akhir', 'Benar', 'Salah', 'Kosong', 'Status', 'Jumlah Pelanggaran', 'Keterangan Pelanggaran', 'Durasi (menit)', 'Waktu Selesai']];
+  rs.forEach(x => {
+    const s = x.tipe === 'selesai';
+    rows.push([x.nama, x.nim, x.kelas, s ? x.nilai : '', s ? x.benar : '', s ? x.salah : '', s ? x.kosong : '',
+      s ? (x.status || 'Selesai') : 'Belum selesai / sedang mengerjakan', s ? (x.violations || 0) : (x.v || 0),
+      arr(x.log).map(l => l.r).join('; '), s ? Math.round((x.durasi || 0) / 60 * 10) / 10 : '', s ? new Date(x.ts).toLocaleString('id-ID') : '']);
+  });
+  dlFile('Rekap_Nilai_DBA_Pertemuan9.csv', '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n'), 'text/csv');
   toast('Rekap CSV Berhasil Diunduh!');
 }
 function expJSON() {
-  const rs = hasilSemua();
+  const rs = barisDosen();
   if (!rs.length) return toast('Belum ada data untuk diunduh.');
-  dlFile('Data_DBA_Pertemuan9.json', JSON.stringify({ p: rs }, null, 2), 'application/json');
+  dlFile('Data_DBA_Pertemuan9.json', JSON.stringify({ hasil: DD.hasil, sesi: DD.sesi }, null, 2), 'application/json');
   toast('Data JSON Berhasil Diunduh!');
 }
 function resetSistem() {
-  dlg({ judul: 'Konfirmasi Reset Data', pesan: 'Seluruh data nilai dan sesi ujian di perangkat ini akan DIHAPUS.\n\nKetik HAPUS untuk mengonfirmasi.',
+  dlg({ judul: 'Konfirmasi Reset Data', pesan: 'Seluruh data nilai dan sesi ujian (di SERVER dan di perangkat ini) akan DIHAPUS.\n\nKetik HAPUS untuk mengonfirmasi.',
         input: 'text', ph: 'Ketik HAPUS...', tombol: 'Hapus Semua Data', bahaya: true,
         cek: v => v.trim() === 'HAPUS' ? '' : 'Ketik HAPUS dengan huruf besar!',
-        aksi: () => {
-          const ks = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && (k.startsWith('dba_assess.p9.'))) ks.push(k); } } catch (e) {}
-          ks.forEach(lsDel); render(true); toast('Seluruh data berhasil direset!');
+        aksi: async () => {
+          if (CLOUD_ON) { const r = await api('DELETE', ''); if (!r.ok) return toast('Gagal menghapus data di server. Periksa koneksi.'); }
+          const ks = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('dba_assess.p9.') && k !== K_DEV) ks.push(k); } } catch (e) {}
+          ks.forEach(lsDel); DD = { sesi: {}, hasil: {}, ts: Date.now(), err: '', ok: true }; render(true); toast('Seluruh data berhasil direset!');
         } });
 }
 function dlFile(nama, t, mime) {
